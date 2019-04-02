@@ -22,7 +22,8 @@ DragonWaveAudioProcessor::DragonWaveAudioProcessor()
 #endif
 		.withOutput("Output", AudioChannelSet::stereo(), true)
 #endif
-	)
+	),
+	parameters(*this, nullptr)
 #endif
 {
 	for (auto i = 0; i < 32; i++) {
@@ -30,6 +31,7 @@ DragonWaveAudioProcessor::DragonWaveAudioProcessor()
 	}
 
 	sound = new WavetableSound();
+	sound->makeSawtooth();
 	synth.addSound(sound);
 }
 
@@ -135,9 +137,19 @@ bool DragonWaveAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts
 
 void DragonWaveAudioProcessor::processBlock(AudioBuffer<float> & buffer, MidiBuffer & midiMessages)
 {
-	ScopedNoDenormals noDenormals;
-
 	buffer.clear();
+
+	int time;
+	MidiMessage m;
+
+	for (MidiBuffer::Iterator i(midiMessages); i.getNextEvent(m, time);)
+	{
+		if (m.isNoteOn())
+			noteOnCount++;
+		else if (m.isNoteOff())
+			noteOnCount--;
+	}
+
 	synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 }
 

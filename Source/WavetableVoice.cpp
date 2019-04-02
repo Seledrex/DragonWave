@@ -30,15 +30,15 @@ void WavetableVoice::startNote(
 	float frequency = (float)MidiMessage::getMidiNoteInHertz(midiNoteNumber);
 
 	// Get the wavetable information
-	wavetable = dynamic_cast<WavetableSound*>(sound)->getWavetable();
-	boundingFrequencies = wavetable->getBoundingFrequencies(frequency);
-	boundingIndexes = wavetable->getBoundingIndexes(boundingFrequencies);
-	tableSize = wavetable->getSize();
+	wavetableSound = dynamic_cast<WavetableSound*>(sound);
+	boundingFrequencies = wavetableSound->getBoundingFrequencies(frequency);
+	boundingIndexes = wavetableSound->getBoundingIndexes(boundingFrequencies);
+	wavetableSize = wavetableSound->getWavetableSize();
 
 	// Set voice data
 	level = velocity * 0.15f;
 	currentIndex = 0.0;
-	tableDelta = frequency * tableSize / (float)getSampleRate();
+	tableDelta = frequency * wavetableSize / (float)getSampleRate();
 
 	// Calculate mixing proportions
 	if (boundingFrequencies.first != boundingFrequencies.second)
@@ -90,20 +90,20 @@ forcedinline float WavetableVoice::getNextSample() noexcept
 	auto frac = currentIndex - (float)indexBefore;
 
 	// Get next sample on lower wavetable
-	auto* tableLo = wavetable->getTables()->getReadPointer(boundingIndexes.first);
+	auto* tableLo = wavetableSound->getWavetables().getReadPointer(boundingIndexes.first);
 	auto valueBeforeLo = tableLo[indexBefore];
 	auto valueAfterLo = tableLo[indexAfter];
 	float currentSampleLo = valueBeforeLo + frac * (valueAfterLo - valueBeforeLo);
 
 	// Get next sample on higher wavetable
-	auto * tableHi = wavetable->getTables()->getReadPointer(boundingIndexes.second);
+	auto * tableHi = wavetableSound->getWavetables().getReadPointer(boundingIndexes.second);
 	auto valueBeforeHi = tableHi[indexBefore];
 	auto valueAfterHi = tableHi[indexAfter];
 	float currentSampleHi = valueBeforeHi + frac * (valueAfterHi - valueBeforeHi);
 
 	// Increment phase change and prevent overflow
 	currentIndex += tableDelta;
-	currentIndex = std::fmod(currentIndex, (float)tableSize);
+	currentIndex = std::fmod(currentIndex, (float)wavetableSize);
 
 	// Mix samples from both wavetables
 	auto currentSample = currentSampleLo * (1.0f - wavetableMix) + currentSampleHi * wavetableMix;

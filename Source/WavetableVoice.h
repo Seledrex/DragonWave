@@ -11,7 +11,7 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "Wavetable.h"
+#include "WavetableSound.h"
 
 class WavetableVoice : public SynthesiserVoice
 {
@@ -25,10 +25,10 @@ public:
 	void controllerMoved(int controllerNumber, int newControllerValue) override;
 
 private:
-	Wavetable* wavetable = NULL;
+	WavetableSound* wavetableSound = nullptr;
 	std::pair<float, float> boundingFrequencies;
 	std::pair<int, int> boundingIndexes;
-	int tableSize = 0;
+	int wavetableSize = 0;
 	float currentIndex = 0.0f;
 	float tableDelta = 0.0f;
 	float level = 0.0f;

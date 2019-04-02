@@ -57,11 +57,17 @@ public:
 	void getStateInformation(MemoryBlock& destData) override;
 	void setStateInformation(const void* data, int sizeInBytes) override;
 
+	//==============================================================================
+	AudioProcessorValueTreeState parameters;
+	WavetableSound* sound;
+
+	//==============================================================================
+	int noteOnCount = 0;
+
 private:
 
 	//==============================================================================
 	Synthesiser synth;
-	WavetableSound* sound;
 
 	//==============================================================================
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DragonWaveAudioProcessor)

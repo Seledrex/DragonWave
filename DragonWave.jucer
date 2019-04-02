@@ -11,8 +11,6 @@
       <FILE id="ODrDN6" name="Logspace.h" compile="0" resource="0" file="Source/Logspace.h"/>
       <FILE id="tDVqDR" name="Util.cpp" compile="1" resource="0" file="Source/Util.cpp"/>
       <FILE id="gD8Vqz" name="Util.h" compile="0" resource="0" file="Source/Util.h"/>
-      <FILE id="Ua00oG" name="Wavetable.cpp" compile="1" resource="0" file="Source/Wavetable.cpp"/>
-      <FILE id="esVHhg" name="Wavetable.h" compile="0" resource="0" file="Source/Wavetable.h"/>
       <FILE id="x2BOgu" name="WavetableSound.cpp" compile="1" resource="0"
             file="Source/WavetableSound.cpp"/>
       <FILE id="f0MzII" name="WavetableSound.h" compile="0" resource="0"
