@@ -12,6 +12,10 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "WavetableSound.h"
+#include "ReferenceCountedSound.h"
+
+//==============================================================================
+class LoadingThread;
 
 //==============================================================================
 /**
@@ -60,14 +64,19 @@ public:
 	//==============================================================================
 	AudioProcessorValueTreeState parameters;
 	WavetableSound* sound;
+	Synthesiser synth;
 
 	//==============================================================================
 	int noteOnCount = 0;
 
-private:
-
 	//==============================================================================
-	Synthesiser synth;
+	std::unique_ptr<LoadingThread> loadingThread;
+	ReferenceCountedArray<ReferenceCountedSound> sounds;
+	ReferenceCountedSound::Ptr currentSound;
+	String chosenPath;
+	WavetableSound::Waveform chosenWaveform;
+
+private:
 
 	//==============================================================================
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DragonWaveAudioProcessor)

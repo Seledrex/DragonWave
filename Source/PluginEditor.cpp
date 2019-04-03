@@ -10,6 +10,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "LoadingThread.h"
 
 //==============================================================================
 DragonWaveAudioProcessorEditor::DragonWaveAudioProcessorEditor(DragonWaveAudioProcessor& p)
@@ -23,6 +24,7 @@ DragonWaveAudioProcessorEditor::DragonWaveAudioProcessorEditor(DragonWaveAudioPr
 
 	addAndMakeVisible(&openButton);
 	openButton.setButtonText("Open wavetable...");
+	openButton.onClick = [this] { openButtonClicked(); };
 
 	formatManager.registerBasicFormats();
 }
@@ -36,13 +38,20 @@ void DragonWaveAudioProcessorEditor::paint(Graphics& g)
 {
 	g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
 
+	ReferenceCountedSound::Ptr retainedCurrentSound(processor.currentSound);
+
+	if (retainedCurrentSound == nullptr)
+		return;
+
+	auto* sound = retainedCurrentSound->getSound();
+	
 	Path staticPath;
 	float x = getWidth() / 2.0f - animationWidth / 2.0f;
 	float dx = animationWidth / (float)tableSize;
 
 	for (int i = 0; i < tableSize; i++)
 	{
-		float sample = processor.sound->getWavetables().getSample(0, i);
+		float sample = sound->getWavetables().getSample(0, i);
 		float y = getHeight() / 2.0f + -1.0f * yRange.convertFrom0to1((sample + 1.0f) / 2.0f);
 		Point<float> p(x, y);
 
@@ -73,7 +82,7 @@ void DragonWaveAudioProcessorEditor::paint(Graphics& g)
 		for (int i = 0; i < animatedIndices.size(); i++)
 		{
 			int index = animatedIndices[i];
-			float sample = processor.sound->getWavetables().getSample(0, index);
+			float sample = sound->getWavetables().getSample(0, index);
 			float y = getHeight() / 2.0f + -1.0f * yRange.convertFrom0to1((sample + 1.0f) / 2.0f);
 			x = getWidth() / 2.0f - animationWidth / 2.0f + dx * index;
 			Point<float> p(x, y);
@@ -103,4 +112,17 @@ void DragonWaveAudioProcessorEditor::timerCallback()
 int DragonWaveAudioProcessorEditor::getFrameCounter()
 {
 	return frameCounter;
+}
+
+void DragonWaveAudioProcessorEditor::openButtonClicked()
+{
+	FileChooser chooser("Select wavetable...", {}, "*.wav");
+
+	if (chooser.browseForFileToOpen())
+	{
+		auto file = chooser.getResult();
+		auto path = file.getFullPathName();
+		processor.chosenPath.swapWith(path);
+		processor.loadingThread->notify();
+	}
 }

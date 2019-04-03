@@ -47,5 +47,8 @@ private:
 	void timerCallback() override;
 	int getFrameCounter();
 
+	//==============================================================================
+	void openButtonClicked();
+
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DragonWaveAudioProcessorEditor)
 };

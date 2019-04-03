@@ -14,6 +14,24 @@ WavetableSound::WavetableSound()
 {
 }
 
+WavetableSound::WavetableSound(const WavetableSound& other)
+{
+	initialized = other.initialized;
+
+	// Copy wavetables
+	wavetables.makeCopyOf(other.wavetables);
+
+	// Copy wavetable map
+	std::copy(other.wavetableMap.begin(),
+		other.wavetableMap.end(),
+		std::inserter(wavetableMap, wavetableMap.begin()));
+
+	// Copy wavetable frequencies
+	std::copy(other.wavetableFrequencies.begin(),
+		other.wavetableFrequencies.end(),
+		std::back_inserter(wavetableFrequencies));
+}
+
 bool WavetableSound::appliesToNote(int)
 {
 	return true;
@@ -123,17 +141,46 @@ void WavetableSound::makeArbitrary(std::vector<float> inputWavetable)
 
 	samples[wavetableSize] = samples[0];
 
-	// Put all the indexes into the table map with their corresponding frequency
-	for (int i = 0; i < wavetableFrequencies.size(); i++)
-		wavetableMap.insert(std::pair<float, int>(wavetableFrequencies[i], i + 1));
+	updateWavetableMap();
+}
 
-	// Set the input wavetable to be the lowest wavetable
-	wavetableMap.insert(std::pair<float, int>(lowestFrequency, 0));
-	wavetableFrequencies.insert(wavetableFrequencies.begin(), lowestFrequency);
+void WavetableSound::makeSine()
+{
+	wavetables.setSize((int)wavetableFrequencies.size() + 2, wavetableSize + 1);
 
-	// Set highest wavetable to be a sine wave
-	wavetableMap.insert(std::pair<float, int>(highestFrequency, wavetables.getNumChannels() - 1));
-	wavetableFrequencies.push_back(highestFrequency);
+	float angleDelta = MathConstants<float>::twoPi / wavetableSize;
+	float currentAngle = 0.0;
+
+	for (int i = 0; i < wavetableSize; i++)
+	{
+		float sample = std::sin(currentAngle);
+
+		for (int channel = 0; channel < wavetables.getNumChannels(); channel++)
+		{
+			auto* samples = wavetables.getWritePointer(channel);
+			samples[i] = sample;
+		}
+
+		currentAngle += angleDelta;
+	}
+
+	for (int channel = 0; channel < wavetables.getNumChannels(); channel++)
+	{
+		auto* samples = wavetables.getWritePointer(channel);
+		samples[wavetableSize] = samples[0];
+	}
+
+	updateWavetableMap();
+}
+
+void WavetableSound::makeTriangle()
+{
+	auto triangle = Util::linspace(0.0, 1.0, wavetableSize / 4);
+	auto mid = Util::linspace(1.0, -1.0, wavetableSize / 2);
+	auto end = Util::linspace(-1.0, 0.0, wavetableSize / 4);
+	triangle.insert(triangle.end(), mid.begin(), mid.end());
+	triangle.insert(triangle.end(), end.begin(), end.end());
+	makeArbitrary(triangle);
 }
 
 void WavetableSound::makeSawtooth()
@@ -154,43 +201,22 @@ void WavetableSound::makeSquare()
 	makeArbitrary(square);
 }
 
-void WavetableSound::makeSine()
+void WavetableSound::makeNoise()
 {
 	wavetables.setSize((int)wavetableFrequencies.size() + 2, wavetableSize + 1);
 
-	float angleDelta = MathConstants<float>::twoPi / wavetableSize;
-	float currentAngle = 0.0;
+	Random random;
 
-	for (int i = 0; i < wavetableSize; i++)
+	for (int i = 0; i <= wavetableSize; i++)
 	{
-		float sample = std::sin(currentAngle);
-
 		for (int channel = 0; channel < wavetables.getNumChannels(); channel++)
 		{
 			auto* samples = wavetables.getWritePointer(channel);
-			samples[i] = sample;
+			samples[i] = random.nextFloat() * 2.0f - 1.0f;
 		}
-		
-		currentAngle += angleDelta;
 	}
 
-	for (int channel = 0; channel < wavetables.getNumChannels(); channel++)
-	{
-		auto* samples = wavetables.getWritePointer(channel);
-		samples[wavetableSize] = samples[0];
-	}
-
-	// Put all the indexes into the table map with their corresponding frequency
-	for (int i = 0; i < wavetableFrequencies.size(); i++)
-		wavetableMap.insert(std::pair<float, int>(wavetableFrequencies[i], i + 1));
-
-	// Set the input wavetable to be the lowest wavetable
-	wavetableMap.insert(std::pair<float, int>(lowestFrequency, 0));
-	wavetableFrequencies.insert(wavetableFrequencies.begin(), lowestFrequency);
-
-	// Set highest wavetable to be a sine wave
-	wavetableMap.insert(std::pair<float, int>(highestFrequency, wavetables.getNumChannels() - 1));
-	wavetableFrequencies.push_back(highestFrequency);
+	updateWavetableMap();
 }
 
 AudioSampleBuffer& WavetableSound::getWavetables()
@@ -256,4 +282,19 @@ std::pair<int, int> WavetableSound::getBoundingIndexes(std::pair<float, float> t
 	auto lo = wavetableMap.find(targetFrequencies.first);
 	auto hi = wavetableMap.find(targetFrequencies.second);
 	return std::pair<int, int>(lo->second, hi->second);
+}
+
+void WavetableSound::updateWavetableMap()
+{
+	// Put all the indexes into the table map with their corresponding frequency
+	for (int i = 0; i < wavetableFrequencies.size(); i++)
+		wavetableMap.insert(std::pair<float, int>(wavetableFrequencies[i], i + 1));
+
+	// Set the input wavetable to be the lowest wavetable
+	wavetableMap.insert(std::pair<float, int>(lowestFrequency, 0));
+	wavetableFrequencies.insert(wavetableFrequencies.begin(), lowestFrequency);
+
+	// Set highest wavetable to be a sine wave
+	wavetableMap.insert(std::pair<float, int>(highestFrequency, wavetables.getNumChannels() - 1));
+	wavetableFrequencies.push_back(highestFrequency);
 }

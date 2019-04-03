@@ -11,6 +11,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "WavetableVoice.h"
+#include "LoadingThread.h"
 
 //==============================================================================
 DragonWaveAudioProcessor::DragonWaveAudioProcessor()
@@ -26,13 +27,14 @@ DragonWaveAudioProcessor::DragonWaveAudioProcessor()
 	parameters(*this, nullptr)
 #endif
 {
+	loadingThread = std::unique_ptr<LoadingThread>(new LoadingThread(*this));
+
 	for (auto i = 0; i < 32; i++) {
 		synth.addVoice(new WavetableVoice());
 	}
 
-	sound = new WavetableSound();
-	sound->makeSawtooth();
-	synth.addSound(sound);
+	chosenWaveform = WavetableSound::Waveform::Sawtooth;
+	loadingThread->notify();
 }
 
 DragonWaveAudioProcessor::~DragonWaveAudioProcessor()
@@ -109,6 +111,7 @@ void DragonWaveAudioProcessor::prepareToPlay(double sampleRate, int /*samplesPer
 
 void DragonWaveAudioProcessor::releaseResources()
 {
+	currentSound = nullptr;
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations

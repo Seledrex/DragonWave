@@ -20,14 +20,17 @@ class WavetableSound : public SynthesiserSound
 {
 public:
 	WavetableSound();
+	WavetableSound(const WavetableSound& other);
 	bool appliesToNote(int) override;
 	bool appliesToChannel(int) override;
 
 	//==============================================================================
 	void makeArbitrary(std::vector<float> wavetable);
+	void makeSine();
+	void makeTriangle();
 	void makeSawtooth();
 	void makeSquare();
-	void makeSine();
+	void makeNoise();
 
 	//==============================================================================
 	AudioSampleBuffer& getWavetables();
@@ -37,8 +40,20 @@ public:
 	std::pair<float, float> getBoundingFrequencies(float target);
 	std::pair<int, int> getBoundingIndexes(std::pair<float, float> targetFrequencies);
 
+	//==============================================================================
+	static const int wavetableSize = 2048;
+
+	//==============================================================================
+	enum Waveform {
+		Sine,
+		Triangle,
+		Sawtooth,
+		Square,
+		Noise,
+		Arbitrary
+	};
+
 private:
-	const int wavetableSize = 2048;
 	const int fftOrder = 16;
 	const int samplingRate = 44100;
 	bool initialized = false;
@@ -54,5 +69,8 @@ private:
 		32.7f, 65.41f, 130.81f, 261.63f, 523.25f,
 		1046.50f, 2093.00f, 4186.01f
 	};
+
+	//==============================================================================
+	void updateWavetableMap();
 
 };
