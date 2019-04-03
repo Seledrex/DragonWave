@@ -17,6 +17,7 @@ WavetableSound::WavetableSound()
 WavetableSound::WavetableSound(const WavetableSound& other)
 {
 	initialized = other.initialized;
+	type = other.type;
 
 	// Copy wavetables
 	wavetables.makeCopyOf(other.wavetables);
@@ -142,6 +143,7 @@ void WavetableSound::makeArbitrary(std::vector<float> inputWavetable)
 	samples[wavetableSize] = samples[0];
 
 	updateWavetableMap();
+	type = Waveform::Arbitrary;
 }
 
 void WavetableSound::makeSine()
@@ -171,24 +173,27 @@ void WavetableSound::makeSine()
 	}
 
 	updateWavetableMap();
+	type = Waveform::Sine;
 }
 
 void WavetableSound::makeTriangle()
 {
-	auto triangle = Util::linspace(0.0, 1.0, wavetableSize / 4);
-	auto mid = Util::linspace(1.0, -1.0, wavetableSize / 2);
-	auto end = Util::linspace(-1.0, 0.0, wavetableSize / 4);
+	auto triangle = Util::linspace(0.0f, 1.0f, wavetableSize / 4);
+	auto mid = Util::linspace(1.0f, -1.0f, wavetableSize / 2);
+	auto end = Util::linspace(-1.0f, 0.0f, wavetableSize / 4);
 	triangle.insert(triangle.end(), mid.begin(), mid.end());
 	triangle.insert(triangle.end(), end.begin(), end.end());
 	makeArbitrary(triangle);
+	type = Waveform::Triangle;
 }
 
 void WavetableSound::makeSawtooth()
 {
-	auto sawtooth = Util::linspace(0.0, 1.0, wavetableSize / 2);
-	auto sawSecondHalf = Util::linspace(-1.0, 0.0, wavetableSize / 2);
+	auto sawtooth = Util::linspace(0.0f, 1.0f, wavetableSize / 2);
+	auto sawSecondHalf = Util::linspace(-1.0f, 0.0f, wavetableSize / 2);
 	sawtooth.insert(sawtooth.end(), sawSecondHalf.begin(), sawSecondHalf.end());
 	makeArbitrary(sawtooth);
+	type = Waveform::Sawtooth;
 }
 
 void WavetableSound::makeSquare()
@@ -199,6 +204,7 @@ void WavetableSound::makeSquare()
 		square[i] = 1.0;
 
 	makeArbitrary(square);
+	type = Waveform::Square;
 }
 
 void WavetableSound::makeNoise()
@@ -217,6 +223,7 @@ void WavetableSound::makeNoise()
 	}
 
 	updateWavetableMap();
+	type = Waveform::Noise;
 }
 
 AudioSampleBuffer& WavetableSound::getWavetables()
@@ -227,6 +234,11 @@ AudioSampleBuffer& WavetableSound::getWavetables()
 int WavetableSound::getWavetableSize()
 {
 	return wavetableSize;
+}
+
+WavetableSound::Waveform WavetableSound::getWaveformType()
+{
+	return type;
 }
 
 std::pair<float, float> WavetableSound::getBoundingFrequencies(float target)

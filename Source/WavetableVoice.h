@@ -25,9 +25,12 @@ public:
 	void controllerMoved(int controllerNumber, int newControllerValue) override;
 
 private:
+	Random random;
 	WavetableSound* wavetableSound = nullptr;
 	std::pair<float, float> boundingFrequencies;
 	std::pair<int, int> boundingIndexes;
+
+	//==============================================================================
 	int wavetableSize = 0;
 	float currentIndex = 0.0f;
 	float tableDelta = 0.0f;

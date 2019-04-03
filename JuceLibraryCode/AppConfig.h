@@ -240,7 +240,7 @@
 #endif
 
 #ifndef    JUCE_DSP_USE_INTEL_MKL
- #define   JUCE_DSP_USE_INTEL_MKL 1
+ //#define JUCE_DSP_USE_INTEL_MKL 0
 #endif
 
 #ifndef    JUCE_DSP_USE_SHARED_FFTW

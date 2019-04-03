@@ -16,7 +16,9 @@
 //==============================================================================
 /**
 */
-class DragonWaveAudioProcessorEditor : public AudioProcessorEditor, public Timer
+class DragonWaveAudioProcessorEditor : public AudioProcessorEditor,
+	                                   public Timer,
+	                                   public Button::Listener
 {
 public:
 	DragonWaveAudioProcessorEditor(DragonWaveAudioProcessor&);
@@ -38,7 +40,11 @@ private:
 
 	//==============================================================================
 	TextButton openButton;
-	AudioFormatManager formatManager;
+	TextButton sineButton;
+	TextButton triangleButton;
+	TextButton sawtoothButton;
+	TextButton squareButton;
+	TextButton noiseButton;
 
 	//==============================================================================
 	int frameCounter;
@@ -49,6 +55,10 @@ private:
 
 	//==============================================================================
 	void openButtonClicked();
+
+	//==============================================================================
+	void buttonClicked(Button* button);
+	void buttonStateChanged(Button* button);
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DragonWaveAudioProcessorEditor)
 };

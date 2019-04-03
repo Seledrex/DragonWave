@@ -52,16 +52,29 @@ void WavetableVoice::renderNextBlock(AudioSampleBuffer & outputBuffer, int start
 	// Make sure we have a note to play
 	if (tableDelta != 0)
 	{
-		while (--numSamples >= 0)
+		if (wavetableSound->getWaveformType() == WavetableSound::Waveform::Noise)
 		{
-			// Calculate current sample
-			auto currentSample = getNextSample() * level;
+			while (--numSamples >= 0)
+			{
+				for (auto i = 0; i < outputBuffer.getNumChannels(); i++)
+					outputBuffer.addSample(i, startSample, (random.nextFloat() * 2 - 1) * level);
 
-			// Place sample into output buffer
-			for (auto i = 0; i < outputBuffer.getNumChannels(); i++)
-				outputBuffer.addSample(i, startSample, currentSample);
+				startSample++;
+			}
+		}
+		else
+		{
+			while (--numSamples >= 0)
+			{
+				// Calculate current sample
+				auto currentSample = getNextSample() * level;
 
-			startSample++;
+				// Place sample into output buffer
+				for (auto i = 0; i < outputBuffer.getNumChannels(); i++)
+					outputBuffer.addSample(i, startSample, currentSample);
+
+				startSample++;
+			}
 		}
 	}
 }

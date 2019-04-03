@@ -14,11 +14,11 @@ std::vector<float> Util::linspace(float start, float end, int num)
 		return linspaced;
 	}
 
-	double delta = (end - start) / (num - 1);
+	float delta = (end - start) / (num - 1);
 
 	for (int i = 0; i < num - 1; ++i)
 	{
-		linspaced.push_back(start + delta * i);
+		linspaced.push_back(start + delta * (float)i);
 	}
 
 	linspaced.push_back(end);
