@@ -19,16 +19,17 @@ public:
 	typedef ReferenceCountedObjectPtr<ReferenceCountedSound> Ptr;
 
 	//==============================================================================
-	ReferenceCountedSound(const String& nameToUse,
+	ReferenceCountedSound(const String& path,
 						  WavetableSound::Waveform type,
 						  const std::vector<float> wavetable = std::vector<float>());
 	~ReferenceCountedSound();
 
 	//==============================================================================
 	WavetableSound* getSound();
+	String getPath();
 
 private:
-	String name;
+	String path;
 	WavetableSound sound;
 	WavetableSound::Waveform type;
 

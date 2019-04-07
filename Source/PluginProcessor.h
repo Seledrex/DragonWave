@@ -23,6 +23,9 @@ class LoadingThread;
 class DragonWaveAudioProcessor : public AudioProcessor
 {
 public:
+	
+	const String WAVEFORM_CHOICE_ID = "waveformChoice";
+	const String WAVETABLE_PATH_ID = "wavetablePath";
 
 	//==============================================================================
 	DragonWaveAudioProcessor();
@@ -62,6 +65,9 @@ public:
 	void setStateInformation(const void* data, int sizeInBytes) override;
 
 	//==============================================================================
+	AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+
+	//==============================================================================
 	AudioProcessorValueTreeState parameters;
 	WavetableSound* sound;
 	Synthesiser synth;
@@ -73,8 +79,10 @@ public:
 	std::unique_ptr<LoadingThread> loadingThread;
 	ReferenceCountedArray<ReferenceCountedSound> sounds;
 	ReferenceCountedSound::Ptr currentSound;
-	String chosenPath;
-	WavetableSound::Waveform chosenWaveform;
+
+	//==============================================================================
+	String chosenPath = "";
+	WavetableSound::Waveform chosenWaveform = WavetableSound::Waveform::Sawtooth;
 
 private:
 

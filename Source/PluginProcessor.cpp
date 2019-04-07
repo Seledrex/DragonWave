@@ -24,7 +24,7 @@ DragonWaveAudioProcessor::DragonWaveAudioProcessor()
 		.withOutput("Output", AudioChannelSet::stereo(), true)
 #endif
 	),
-	parameters(*this, nullptr)
+	parameters(*this, nullptr, "PARAMETERS", createParameterLayout())
 #endif
 {
 	loadingThread = std::unique_ptr<LoadingThread>(new LoadingThread(*this));
@@ -33,8 +33,13 @@ DragonWaveAudioProcessor::DragonWaveAudioProcessor()
 		synth.addVoice(new WavetableVoice());
 	}
 
-	chosenWaveform = WavetableSound::Waveform::Sawtooth;
 	loadingThread->notify();
+}
+
+AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createParameterLayout()
+{
+	std::vector<std::unique_ptr<RangedAudioParameter>> params;
+	return { params.begin(), params.end() };
 }
 
 DragonWaveAudioProcessor::~DragonWaveAudioProcessor()
@@ -168,17 +173,44 @@ AudioProcessorEditor* DragonWaveAudioProcessor::createEditor()
 }
 
 //==============================================================================
-void DragonWaveAudioProcessor::getStateInformation(MemoryBlock& /*destData*/)
+void DragonWaveAudioProcessor::getStateInformation(MemoryBlock& destData)
 {
 	// You should use this method to store your parameters in the memory block.
 	// You could do that either as raw data, or use the XML or ValueTree classes
 	// as intermediaries to make it easy to save and load complex data.
+
+	auto state = parameters.copyState();
+	std::unique_ptr<XmlElement> xml(state.createXml());
+
+	int enumVal = chosenWaveform;
+	xml->setAttribute(WAVEFORM_CHOICE_ID, enumVal);
+
+	if (currentSound != nullptr)
+		xml->setAttribute(WAVETABLE_PATH_ID, currentSound->getPath());
+	else
+		xml->setAttribute(WAVETABLE_PATH_ID, "");
+
+	copyXmlToBinary(*xml, destData);
 }
 
-void DragonWaveAudioProcessor::setStateInformation(const void* /*data*/, int /*sizeInBytes*/)
+void DragonWaveAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
 	// You should use this method to restore your parameters from this memory block,
 	// whose contents will have been created by the getStateInformation() call.
+
+	std::unique_ptr<XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
+
+	if (xmlState.get() != nullptr)
+	{
+		if (xmlState->hasTagName(parameters.state.getType()))
+		{
+			parameters.replaceState(ValueTree::fromXml(*xmlState));
+			int chosenWavefromIndex = std::stoi(xmlState->getStringAttribute(WAVEFORM_CHOICE_ID).toStdString());
+			chosenWaveform = static_cast<WavetableSound::Waveform>(chosenWavefromIndex);
+			chosenPath = xmlState->getStringAttribute(WAVETABLE_PATH_ID);
+			loadingThread->notify();
+		}
+	}
 }
 
 //==============================================================================

@@ -40,6 +40,8 @@
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" targetName="Dragon Wave" binaryPath="C:\Program Files\VSTPlugins\JUCE\Dragon Wave\Debug"
                        headerPath="C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.3.203\windows\mkl\include"/>
+        <CONFIGURATION isDebug="1" name="Ableton" targetName="Dragon Wave" binaryPath="C:\Program Files\VSTPlugins\JUCE\Dragon Wave\Debug"
+                       headerPath="C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.3.203\windows\mkl\include"/>
         <CONFIGURATION isDebug="0" name="Release" binaryPath="C:\Program Files\VSTPlugins\JUCE\Dragon Wave\Release"
                        targetName="Dragon Wave" useRuntimeLibDLL="0" headerPath="C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.3.203\windows\mkl\include"/>
       </CONFIGURATIONS>

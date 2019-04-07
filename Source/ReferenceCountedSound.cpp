@@ -10,13 +10,18 @@
 
 #include "ReferenceCountedSound.h"
 
-ReferenceCountedSound::ReferenceCountedSound(const String& nameToUse,
+/*
+This class is used to keep track of how many references are associated with a loaded
+sound. This is to ensure that the multithreading will work seemlessly.
+*/
+ReferenceCountedSound::ReferenceCountedSound(const String& path,
 											 WavetableSound::Waveform type,
 											 const std::vector<float> wavetable)
-	: name(nameToUse), sound()
+	: path(path), sound()
 {
 	this->type = type;
 
+	// Create a sound using the specified type
 	switch (type) {
 	case WavetableSound::Waveform::Sine:
 		sound.makeSine();
@@ -40,7 +45,7 @@ ReferenceCountedSound::ReferenceCountedSound(const String& nameToUse,
 		break;
 	case WavetableSound::Waveform::Arbitrary:
 		sound.makeArbitrary(wavetable);
-		DBG("Sound named '" + name + "' created");
+		DBG("Sound from '" + path + "' created");
 		break;
 	}
 }
@@ -64,7 +69,7 @@ ReferenceCountedSound::~ReferenceCountedSound()
 		DBG("Sound named 'Noise' destroyed");
 		break;
 	case WavetableSound::Waveform::Arbitrary:
-		DBG("Sound named '" + name + "' destroyed");
+		DBG("Sound from '" + path + "' destroyed");
 		break;
 	}
 }
@@ -72,4 +77,9 @@ ReferenceCountedSound::~ReferenceCountedSound()
 WavetableSound* ReferenceCountedSound::getSound()
 {
 	return &sound;
+}
+
+String ReferenceCountedSound::getPath()
+{
+	return path;
 }

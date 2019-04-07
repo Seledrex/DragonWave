@@ -49,9 +49,11 @@ void LoadingThread::checkForSoundsToFree()
 
 void LoadingThread::checkForWaveformToSet()
 {
-	if (previousWaveform != processor.chosenWaveform)
+	auto retainedChosenWaveform = processor.chosenWaveform;
+
+	if (previousWaveform != retainedChosenWaveform)
 	{
-		ReferenceCountedSound::Ptr newSound = new ReferenceCountedSound("", processor.chosenWaveform);
+		ReferenceCountedSound::Ptr newSound = new ReferenceCountedSound("", retainedChosenWaveform);
 
 		processor.currentSound = newSound;
 		processor.sounds.add(newSound);
@@ -59,7 +61,7 @@ void LoadingThread::checkForWaveformToSet()
 		processor.synth.clearSounds();
 		processor.synth.addSound(new WavetableSound(*processor.currentSound->getSound()));
 
-		previousWaveform = processor.chosenWaveform;
+		previousWaveform = retainedChosenWaveform;
 	}
 }
 
@@ -86,7 +88,7 @@ void LoadingThread::checkForPathToOpen()
 					wavetable[i] = buffer.getSample(0, i);
 
 				ReferenceCountedSound::Ptr newSound = new ReferenceCountedSound(
-					file.getFileName(),
+					file.getFullPathName(),
 					WavetableSound::Waveform::Arbitrary,
 					wavetable);
 
