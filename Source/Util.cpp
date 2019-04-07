@@ -1,5 +1,7 @@
+
 #include "Util.h"
 
+// Linearly space num points between start and end points
 std::vector<float> Util::linspace(float start, float end, int num)
 {
 	std::vector<float> linspaced;
@@ -26,6 +28,7 @@ std::vector<float> Util::linspace(float start, float end, int num)
 	return linspaced;
 }
 
+// Logarithmically space num points between start and stop base
 std::vector<float> Util::logspace(float start, float stop, int num, float base = 10) {
 	float realStart = pow(base, start);
 	float realBase = pow(base, (stop - start) / num);
@@ -36,6 +39,7 @@ std::vector<float> Util::logspace(float start, float stop, int num, float base =
 	return retval;
 }
 
+// Get current time in milliseconds
 long long Util::getTimeMs()
 {
 	milliseconds ms = duration_cast<milliseconds>(
@@ -44,11 +48,13 @@ long long Util::getTimeMs()
 	return ms.count();
 }
 
+// Round float to nearest even integer
 int Util::toNearestEven(float x)
 {
 	return roundToInt(x / 2) * 2;
 }
 
+// Print a vector to a file
 void Util::printToFile(std::vector<float> v, std::string filename)
 {
 	std::ofstream file;
@@ -61,6 +67,7 @@ void Util::printToFile(std::vector<float> v, std::string filename)
 	file.close();
 }
 
+// Print wavetable array to a file
 void Util::tableToFile(std::vector<std::vector<float>> v, std::string filename)
 {
 	std::ofstream file;
@@ -76,6 +83,7 @@ void Util::tableToFile(std::vector<std::vector<float>> v, std::string filename)
 	file.close();
 }
 
+// Generates an exponential window
 std::vector<float> Util::genWindow(int size, float percent)
 {
 	int smoothed = toNearestEven(size * (1 - percent));
@@ -121,6 +129,7 @@ std::vector<float> Util::genWindow(int size, float percent)
 	return v;
 }
 
+// Duplicates a vector by concatenating itself several times
 std::vector<float> Util::duplicateTable(int times, std::vector<float> table)
 {
 	std::vector<float> newTable(table.size() * times);

@@ -24,26 +24,28 @@ DragonWaveAudioProcessor::DragonWaveAudioProcessor()
 		.withOutput("Output", AudioChannelSet::stereo(), true)
 #endif
 	),
-	parameters(*this, nullptr, "PARAMETERS", createParameterLayout())
+	parameters(*this, nullptr, "PARAMETERS", createParameterLayout()) // Initialize parameters
 #endif
 {
-	loadingThread = std::unique_ptr<LoadingThread>(new LoadingThread(*this));
-
+	// Add voices to the synth
 	for (auto i = 0; i < 32; i++) {
 		synth.addVoice(new WavetableVoice());
 	}
 
-	loadingThread->notify();
-}
-
-AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createParameterLayout()
-{
-	std::vector<std::unique_ptr<RangedAudioParameter>> params;
-	return { params.begin(), params.end() };
+	// Start the loading thread
+	loadingThread = std::unique_ptr<LoadingThread>(new LoadingThread(*this));
 }
 
 DragonWaveAudioProcessor::~DragonWaveAudioProcessor()
 {
+}
+
+//==============================================================================
+AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createParameterLayout()
+{
+	// Define parameters here
+	std::vector<std::unique_ptr<RangedAudioParameter>> params;
+	return { params.begin(), params.end() };
 }
 
 //==============================================================================
@@ -150,6 +152,7 @@ void DragonWaveAudioProcessor::processBlock(AudioBuffer<float> & buffer, MidiBuf
 	int time;
 	MidiMessage m;
 
+	// Keep track of note on count for the editor animation
 	for (MidiBuffer::Iterator i(midiMessages); i.getNextEvent(m, time);)
 	{
 		if (m.isNoteOn())
@@ -157,6 +160,10 @@ void DragonWaveAudioProcessor::processBlock(AudioBuffer<float> & buffer, MidiBuf
 		else if (m.isNoteOff())
 			noteOnCount--;
 	}
+
+	// Make sure count does not go negative!
+	if (noteOnCount < 0)
+		noteOnCount = 0;
 
 	synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 }
@@ -175,39 +182,44 @@ AudioProcessorEditor* DragonWaveAudioProcessor::createEditor()
 //==============================================================================
 void DragonWaveAudioProcessor::getStateInformation(MemoryBlock& destData)
 {
-	// You should use this method to store your parameters in the memory block.
-	// You could do that either as raw data, or use the XML or ValueTree classes
-	// as intermediaries to make it easy to save and load complex data.
-
+	// Copy state and convert to XML
 	auto state = parameters.copyState();
 	std::unique_ptr<XmlElement> xml(state.createXml());
 
+	// Include waveform choice
 	int enumVal = chosenWaveform;
 	xml->setAttribute(WAVEFORM_CHOICE_ID, enumVal);
 
+	// Include wavetable file path
 	if (currentSound != nullptr)
 		xml->setAttribute(WAVETABLE_PATH_ID, currentSound->getPath());
 	else
 		xml->setAttribute(WAVETABLE_PATH_ID, "");
 
+	// Store parameters in the memory block
 	copyXmlToBinary(*xml, destData);
 }
 
+// Restores parameters from this memory block,
+// whose contents will have been created by the getStateInformation() call.
 void DragonWaveAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
-	// You should use this method to restore your parameters from this memory block,
-	// whose contents will have been created by the getStateInformation() call.
-
+	// Read memory block into XML
 	std::unique_ptr<XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
 
 	if (xmlState.get() != nullptr)
 	{
 		if (xmlState->hasTagName(parameters.state.getType()))
 		{
+			// Replace parameter state with that of the XML
 			parameters.replaceState(ValueTree::fromXml(*xmlState));
+
+			// Get the chosen waveform and file path for the wavetable
 			int chosenWavefromIndex = std::stoi(xmlState->getStringAttribute(WAVEFORM_CHOICE_ID).toStdString());
 			chosenWaveform = static_cast<WavetableSound::Waveform>(chosenWavefromIndex);
 			chosenPath = xmlState->getStringAttribute(WAVETABLE_PATH_ID);
+
+			// Notify the thread to load
 			loadingThread->notify();
 		}
 	}

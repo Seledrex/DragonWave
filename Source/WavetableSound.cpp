@@ -33,6 +33,7 @@ WavetableSound::WavetableSound(const WavetableSound& other)
 		std::back_inserter(wavetableFrequencies));
 }
 
+//==============================================================================
 bool WavetableSound::appliesToNote(int)
 {
 	return true;
@@ -43,6 +44,7 @@ bool WavetableSound::appliesToChannel(int)
 	return true;
 }
 
+//==============================================================================
 void WavetableSound::makeArbitrary(std::vector<float> inputWavetable)
 {
 	// If already initialized or wrong size, do nothing
@@ -226,6 +228,7 @@ void WavetableSound::makeNoise()
 	type = Waveform::Noise;
 }
 
+//==============================================================================
 AudioSampleBuffer& WavetableSound::getWavetables()
 {
 	return wavetables;
@@ -241,6 +244,7 @@ WavetableSound::Waveform WavetableSound::getWaveformType()
 	return type;
 }
 
+//==============================================================================
 std::pair<float, float> WavetableSound::getBoundingFrequencies(float target)
 {
 	int n = (int)wavetableFrequencies.size();
@@ -296,6 +300,7 @@ std::pair<int, int> WavetableSound::getBoundingIndexes(std::pair<float, float> t
 	return std::pair<int, int>(lo->second, hi->second);
 }
 
+//==============================================================================
 void WavetableSound::updateWavetableMap()
 {
 	// Put all the indexes into the table map with their corresponding frequency

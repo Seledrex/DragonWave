@@ -18,6 +18,8 @@ class LoadingThread : public Thread
 public:
 	LoadingThread(DragonWaveAudioProcessor& p);
 	~LoadingThread();
+
+	//==============================================================================
 	void run() override;
 
 	//==============================================================================
@@ -28,7 +30,7 @@ public:
 private:
 	DragonWaveAudioProcessor& processor;
 	AudioFormatManager formatManager;
-	WavetableSound::Waveform previousWaveform;
+	WavetableSound::Waveform previousWaveform = WavetableSound::Waveform::Arbitrary;;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LoadingThread)
 };

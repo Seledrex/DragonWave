@@ -17,6 +17,8 @@ class WavetableVoice : public SynthesiserVoice
 {
 public:
 	WavetableVoice();
+
+	//==============================================================================
 	bool canPlaySound(SynthesiserSound* sound) override;
 	void startNote(int midiNoteNumber, float velocity, SynthesiserSound* sound, int currentPitchWheelPosition) override;
 	void renderNextBlock(AudioSampleBuffer& outputBuffer, int startSample, int numSamples) override;
@@ -37,5 +39,9 @@ private:
 	float level = 0.0f;
 	float wavetableMix = 0.0f;
 
+	//==============================================================================
 	forcedinline float getNextSample() noexcept;
+
+	//==============================================================================
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WavetableVoice);
 };

@@ -12,6 +12,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
+// Useful functional style C++ methods
 class Functional
 {
 public:

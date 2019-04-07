@@ -32,6 +32,9 @@ public:
 	~DragonWaveAudioProcessor();
 
 	//==============================================================================
+	AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+
+	//==============================================================================
 	void prepareToPlay(double sampleRate, int samplesPerBlock) override;
 	void releaseResources() override;
 
@@ -63,9 +66,6 @@ public:
 	//==============================================================================
 	void getStateInformation(MemoryBlock& destData) override;
 	void setStateInformation(const void* data, int sizeInBytes) override;
-
-	//==============================================================================
-	AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
 	//==============================================================================
 	AudioProcessorValueTreeState parameters;

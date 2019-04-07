@@ -19,6 +19,11 @@
 class WavetableSound : public SynthesiserSound
 {
 public:
+
+	//==============================================================================
+	static const int wavetableSize = 2048;
+
+	//==============================================================================
 	enum Waveform {
 		Sine,
 		Triangle,
@@ -31,6 +36,8 @@ public:
 	//==============================================================================
 	WavetableSound();
 	WavetableSound(const WavetableSound& other);
+
+	//==============================================================================
 	bool appliesToNote(int) override;
 	bool appliesToChannel(int) override;
 
@@ -50,9 +57,6 @@ public:
 	//==============================================================================
 	std::pair<float, float> getBoundingFrequencies(float target);
 	std::pair<int, int> getBoundingIndexes(std::pair<float, float> targetFrequencies);
-
-	//==============================================================================
-	static const int wavetableSize = 2048;
 
 private:
 	const int fftOrder = 16;
@@ -75,4 +79,6 @@ private:
 	//==============================================================================
 	void updateWavetableMap();
 
+	//==============================================================================
+	JUCE_LEAK_DETECTOR(WavetableSound);
 };

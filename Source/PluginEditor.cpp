@@ -54,15 +54,20 @@ DragonWaveAudioProcessorEditor::~DragonWaveAudioProcessorEditor()
 //==============================================================================
 void DragonWaveAudioProcessorEditor::paint(Graphics& g)
 {
+	// Fill background color
 	g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
 
+	// Keep a copy of the current sound
 	ReferenceCountedSound::Ptr retainedCurrentSound(processor.currentSound);
+	int retainedNoteOnCount = processor.noteOnCount;
 
+	// Do not draw waveform if there is none to draw
 	if (retainedCurrentSound == nullptr)
 		return;
 
 	auto* sound = retainedCurrentSound->getSound();
 	
+	// Create static waveform path
 	Path staticPath;
 	float x = getWidth() / 2.0f - animationWidth / 2.0f;
 	float dx = animationWidth / (float)tableSize;
@@ -82,11 +87,14 @@ void DragonWaveAudioProcessorEditor::paint(Graphics& g)
 		x += dx;
 	}
 
+	// Draw the static waveform path
 	g.setColour(getLookAndFeel().findColour(Slider::thumbColourId));
 	g.strokePath(staticPath, PathStrokeType(4.0f));
 
-	if (processor.noteOnCount > 0)
+	// Check if the note on count is more than 0
+	if (retainedNoteOnCount > 0)
 	{
+		// Create animated waveform path
 		Path animatedPath;
 		int animatedPathSize = tableSize / 4;
 		int animatedPathDelta = getFrameCounter() * 50 % tableSize + tableSize / 2;
@@ -112,6 +120,7 @@ void DragonWaveAudioProcessorEditor::paint(Graphics& g)
 				animatedPath.lineTo(p);
 		}
 
+		// Draw animated waveform path
 		g.setColour(Colours::antiquewhite);
 		g.strokePath(animatedPath, PathStrokeType(4.0f));
 	}
@@ -129,6 +138,7 @@ void DragonWaveAudioProcessorEditor::resized()
 	noiseButton.setBounds(10 + buttonWidth * 4, 32, buttonWidth, 20);
 }
 
+//==============================================================================
 void DragonWaveAudioProcessorEditor::timerCallback()
 {
 	repaint();
@@ -140,12 +150,15 @@ int DragonWaveAudioProcessorEditor::getFrameCounter()
 	return frameCounter;
 }
 
+//==============================================================================
 void DragonWaveAudioProcessorEditor::openButtonClicked()
 {
 	FileChooser chooser("Select wavetable...", {}, "*.wav");
 
+	// Open file chooser
 	if (chooser.browseForFileToOpen())
 	{
+		// Update chosen path and notify loading thread
 		auto file = chooser.getResult();
 		auto path = file.getFullPathName();
 		processor.chosenPath.swapWith(path);
@@ -153,10 +166,12 @@ void DragonWaveAudioProcessorEditor::openButtonClicked()
 	}
 }
 
+//==============================================================================
 void DragonWaveAudioProcessorEditor::buttonClicked(Button* button)
 {
 	WavetableSound::Waveform type;
 
+	// Set waveform type
 	if (button == &sineButton)
 		type = WavetableSound::Waveform::Sine;
 	else if (button == &triangleButton)
@@ -168,6 +183,7 @@ void DragonWaveAudioProcessorEditor::buttonClicked(Button* button)
 	else
 		type = WavetableSound::Waveform::Noise;
 
+	// Update chosen waveform and notify loading thread
 	processor.chosenWaveform = type;
 	processor.loadingThread->notify();
 }

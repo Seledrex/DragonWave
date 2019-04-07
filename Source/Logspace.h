@@ -1,5 +1,7 @@
+
 #pragma once
 
+// Logarithmically spaces a range
 template<typename T>
 class Logspace {
 private:

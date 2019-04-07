@@ -74,6 +74,7 @@ ReferenceCountedSound::~ReferenceCountedSound()
 	}
 }
 
+//==============================================================================
 WavetableSound* ReferenceCountedSound::getSound()
 {
 	return &sound;
