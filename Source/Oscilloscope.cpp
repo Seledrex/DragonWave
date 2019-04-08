@@ -41,8 +41,8 @@ void Oscilloscope::paint (Graphics& g)
 	Rectangle<float> area(areaX, areaY, areaWidth, areaHeight);
 
 	// Calculate animation height and width
-	float animationWidth = areaWidth - 20.0f;
-	float animationHeight = areaHeight - 20.0f;
+	float animationWidth = areaWidth - Constants::PADDING * 2;
+	float animationHeight = areaHeight - Constants::PADDING * 2;
 
 	// Create value ranges for the animation
 	NormalisableRange<float> yRange(-1.0f * animationHeight / 2.0f, animationHeight / 2.0f);
@@ -117,19 +117,19 @@ void Oscilloscope::paint (Graphics& g)
 
 	// Draw border
 	g.setColour(Colours::white);
-	g.drawRoundedRectangle(area, 10.0f, 2.0f);
+	g.drawRoundedRectangle(area, (float)Constants::PADDING, 2.0f);
 }
 
 void Oscilloscope::resized()
 {
 }
 
-void Oscilloscope::setFrameCount(int frameCount)
+void Oscilloscope::setFrameCount(int count)
 {
-	this->frameCount = frameCount;
+	frameCount = count;
 }
 
-void Oscilloscope::setSound(ReferenceCountedSound::Ptr retainedCurrentSound)
+void Oscilloscope::setSound(ReferenceCountedSound::Ptr sound)
 {
-	this->retainedCurrentSound = retainedCurrentSound;
+	retainedCurrentSound = sound;
 }

@@ -66,7 +66,7 @@ void CarrierOscillator::paint (Graphics& g)
 
 	// Draw border
 	g.setColour(Colours::white);
-	g.drawRoundedRectangle(componentArea, 10.0f, 2.0f);
+	g.drawRoundedRectangle(componentArea, (float)Constants::PADDING, 2.0f);
 }
 
 void CarrierOscillator::resized()
@@ -83,14 +83,14 @@ void CarrierOscillator::resized()
 	int buttonWidth = (componentAreaInt.getWidth() - Constants::PADDING * 2) / 5;
 
 	componentAreaInt.removeFromTop(Constants::PADDING);
-	Rectangle<int> buttonRow1 = componentAreaInt.removeFromTop(20);
-	buttonRow1.removeFromLeft(Constants::PADDING);
-	buttonRow1.removeFromRight(Constants::PADDING);
+	Rectangle<int> buttonRow1 = componentAreaInt.removeFromTop(20).
+		withTrimmedLeft(Constants::PADDING).
+		withTrimmedRight(Constants::PADDING);
 
 	componentAreaInt.removeFromTop(2);
-	Rectangle<int> buttonRow2 = componentAreaInt.removeFromTop(20);
-	buttonRow2.removeFromLeft(Constants::PADDING);
-	buttonRow2.removeFromRight(Constants::PADDING);
+	Rectangle<int> buttonRow2 = componentAreaInt.removeFromTop(20).
+		withTrimmedLeft(Constants::PADDING).
+		withTrimmedRight(Constants::PADDING);
 
 	sineButton.setBounds(buttonRow1.removeFromLeft(buttonWidth));
 	triangleButton.setBounds(buttonRow1.removeFromLeft(buttonWidth));

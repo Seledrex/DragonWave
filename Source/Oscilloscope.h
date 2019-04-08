@@ -27,8 +27,8 @@ public:
     void resized() override;
 
 	//=============================================================================
-	void setFrameCount(int frameCount);
-	void setSound(ReferenceCountedSound::Ptr retainedCurrentSound);
+	void setFrameCount(int count);
+	void setSound(ReferenceCountedSound::Ptr sound);
 
 private:
 	DragonWaveAudioProcessor& processor;
