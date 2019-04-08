@@ -13,19 +13,15 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "WavetableSound.h"
 #include "ReferenceCountedSound.h"
+#include "Constants.h"
 
 //==============================================================================
 class LoadingThread;
 
 //==============================================================================
-/**
-*/
 class DragonWaveAudioProcessor : public AudioProcessor
 {
 public:
-	
-	const String WAVEFORM_CHOICE_ID = "waveformChoice";
-	const String WAVETABLE_PATH_ID = "wavetablePath";
 
 	//==============================================================================
 	DragonWaveAudioProcessor();

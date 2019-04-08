@@ -7,6 +7,8 @@
               headerPath="C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.3.203\windows\mkl\include">
   <MAINGROUP id="TK3EPU" name="DragonWave">
     <GROUP id="{388B9577-A319-1C78-64C1-E413A09BEB49}" name="Source">
+      <FILE id="txHNDh" name="Constants.cpp" compile="1" resource="0" file="Source/Constants.cpp"/>
+      <FILE id="BM42gc" name="Constants.h" compile="0" resource="0" file="Source/Constants.h"/>
       <FILE id="ZJcxZa" name="LoadingThread.cpp" compile="1" resource="0"
             file="Source/LoadingThread.cpp"/>
       <FILE id="Mf4l8m" name="LoadingThread.h" compile="0" resource="0" file="Source/LoadingThread.h"/>

@@ -45,6 +45,31 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 {
 	// Define parameters here
 	std::vector<std::unique_ptr<RangedAudioParameter>> params;
+
+	auto filterType = std::make_unique<AudioParameterChoice>(
+		Constants::FILTER_TYPE_ID,
+		Constants::FILTER_TYPE_NAME,
+		StringArray("Lowpass", "Highpass", "Bandpass"),
+		0
+	);
+	params.push_back(std::move(filterType));
+
+	auto filterCutoff = std::make_unique<AudioParameterFloat>(
+		Constants::FILTER_CUTOFF_ID,
+		Constants::FILTER_CUTOFF_NAME,
+		NormalisableRange<float>(20.0f, 22050.0f, 0.01f, 0.5f),
+		22050.0f
+	);
+	params.push_back(std::move(filterCutoff));
+
+	auto filterQ = std::make_unique<AudioParameterFloat>(
+		Constants::FILTER_Q_ID,
+		Constants::FILTER_Q_NAME,
+		NormalisableRange<float>(1.0f, 5.0f, 1.0f),
+		1.0f
+	);
+	params.push_back(std::move(filterQ));
+
 	return { params.begin(), params.end() };
 }
 
@@ -188,13 +213,13 @@ void DragonWaveAudioProcessor::getStateInformation(MemoryBlock& destData)
 
 	// Include waveform choice
 	int enumVal = chosenWaveform;
-	xml->setAttribute(WAVEFORM_CHOICE_ID, enumVal);
+	xml->setAttribute(Constants::WAVEFORM_TYPE_ID, enumVal);
 
 	// Include wavetable file path
 	if (currentSound != nullptr)
-		xml->setAttribute(WAVETABLE_PATH_ID, currentSound->getPath());
+		xml->setAttribute(Constants::WAVETABLE_PATH_ID, currentSound->getPath());
 	else
-		xml->setAttribute(WAVETABLE_PATH_ID, "");
+		xml->setAttribute(Constants::WAVETABLE_PATH_ID, "");
 
 	// Store parameters in the memory block
 	copyXmlToBinary(*xml, destData);
@@ -215,9 +240,9 @@ void DragonWaveAudioProcessor::setStateInformation(const void* data, int sizeInB
 			parameters.replaceState(ValueTree::fromXml(*xmlState));
 
 			// Get the chosen waveform and file path for the wavetable
-			int chosenWavefromIndex = std::stoi(xmlState->getStringAttribute(WAVEFORM_CHOICE_ID).toStdString());
+			int chosenWavefromIndex = std::stoi(xmlState->getStringAttribute(Constants::WAVEFORM_TYPE_ID).toStdString());
 			chosenWaveform = static_cast<WavetableSound::Waveform>(chosenWavefromIndex);
-			chosenPath = xmlState->getStringAttribute(WAVETABLE_PATH_ID);
+			chosenPath = xmlState->getStringAttribute(Constants::WAVETABLE_PATH_ID);
 
 			// Notify the thread to load
 			loadingThread->notify();
