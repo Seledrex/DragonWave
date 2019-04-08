@@ -9,6 +9,9 @@
     <GROUP id="{388B9577-A319-1C78-64C1-E413A09BEB49}" name="Source">
       <FILE id="txHNDh" name="Constants.cpp" compile="1" resource="0" file="Source/Constants.cpp"/>
       <FILE id="BM42gc" name="Constants.h" compile="0" resource="0" file="Source/Constants.h"/>
+      <FILE id="Qtkjw3" name="Oscilloscope.cpp" compile="1" resource="0"
+            file="Source/Oscilloscope.cpp"/>
+      <FILE id="yKW92G" name="Oscilloscope.h" compile="0" resource="0" file="Source/Oscilloscope.h"/>
       <FILE id="ZJcxZa" name="LoadingThread.cpp" compile="1" resource="0"
             file="Source/LoadingThread.cpp"/>
       <FILE id="Mf4l8m" name="LoadingThread.h" compile="0" resource="0" file="Source/LoadingThread.h"/>
@@ -35,6 +38,12 @@
       <FILE id="Z4g1T9" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
       <FILE id="pcD5f5" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      <FILE id="gG6HO7" name="CarrierOscillator.cpp" compile="1" resource="0"
+            file="Source/CarrierOscillator.cpp"/>
+      <FILE id="AxbUd4" name="CarrierOscillator.h" compile="0" resource="0"
+            file="Source/CarrierOscillator.h"/>
+      <FILE id="txNEvp" name="Filter.cpp" compile="1" resource="0" file="Source/Filter.cpp"/>
+      <FILE id="M2pOyH" name="Filter.h" compile="0" resource="0" file="Source/Filter.h"/>
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>

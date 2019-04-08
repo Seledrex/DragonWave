@@ -12,13 +12,14 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
+#include "Oscilloscope.h"
+#include "CarrierOscillator.h"
 
 //==============================================================================
 /**
 */
 class DragonWaveAudioProcessorEditor : public AudioProcessorEditor,
-	                                   public Timer,
-	                                   public Button::Listener
+	                                   public Timer
 {
 public:
 	DragonWaveAudioProcessorEditor(DragonWaveAudioProcessor&);
@@ -32,33 +33,12 @@ private:
 	DragonWaveAudioProcessor& processor;
 
 	//==============================================================================
-	int tableSize = 2048;
-	float animationWidth = 200.0f;
-	float animationHeight = 100.0f;
-	NormalisableRange<float> yRange;
-	NormalisableRange<float> xRange;
-
-	//==============================================================================
-	TextButton openButton;
-	TextButton sineButton;
-	TextButton triangleButton;
-	TextButton sawtoothButton;
-	TextButton squareButton;
-	TextButton noiseButton;
+	Oscilloscope carrierOscilloscopeGUI;
+	CarrierOscillator carrierOscGUI;
 
 	//==============================================================================
 	int frameCounter;
-
-	//==============================================================================
 	void timerCallback() override;
-	int getFrameCounter();
-
-	//==============================================================================
-	void openButtonClicked();
-
-	//==============================================================================
-	void buttonClicked(Button* button);
-	void buttonStateChanged(Button* button);
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DragonWaveAudioProcessorEditor)
 };
