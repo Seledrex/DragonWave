@@ -40,4 +40,16 @@ public:
 	static const String FM_OSCILLOSCOPE_TITLE;
 	static const String CARRIER_OSCILLATOR_TITLE;
 	static const String FM_OSCILLATOR_TITLE;
+
+	//==============================================================================
+	static const String SINE;
+	static const String TRIANGLE;
+	static const String SAWTOOTH;
+	static const String SQUARE;
+	static const String NOISE;
+
+	//==============================================================================
+	static const String OPEN_WAVETABLE;
+	static const String SELECT_WAVETABLE;
+
 };

@@ -36,3 +36,15 @@ const String Constants::CARRIER_OSCILLOSCOPE_TITLE = "Carrier Oscillator";
 const String Constants::FM_OSCILLOSCOPE_TITLE = "FM Oscillator";
 const String Constants::CARRIER_OSCILLATOR_TITLE = "Carrier Oscillator Settings";
 const String Constants::FM_OSCILLATOR_TITLE = "FM Oscillator Settings";
+
+//==============================================================================
+const String Constants::SINE = "Sin";
+const String Constants::TRIANGLE = "Tri";
+const String Constants::SAWTOOTH = "Saw";
+const String Constants::SQUARE = "Square";
+const String Constants::NOISE = "Noise";
+
+//==============================================================================
+const String Constants::OPEN_WAVETABLE = "Open wavetable...";
+const String Constants::SELECT_WAVETABLE = "Select wavetable...";
+

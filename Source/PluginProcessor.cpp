@@ -187,12 +187,9 @@ bool DragonWaveAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts
 
 void DragonWaveAudioProcessor::processBlock(AudioBuffer<float> & buffer, MidiBuffer & midiMessages)
 {
-	buffer.clear();
-
+	// Keep track of note on count for the editor animation
 	int time;
 	MidiMessage m;
-
-	// Keep track of note on count for the editor animation
 	for (MidiBuffer::Iterator i(midiMessages); i.getNextEvent(m, time);)
 	{
 		if (m.isNoteOn())
@@ -205,6 +202,7 @@ void DragonWaveAudioProcessor::processBlock(AudioBuffer<float> & buffer, MidiBuf
 	if (noteOnCount < 0)
 		noteOnCount = 0;
 
+	// Add or remove voices from the synth
 	int numVoices = (int)* parameters.getRawParameterValue(Constants::OSCILLATOR_VOICES_ID);
 	if (numVoices < synth.getNumVoices())
 	{
@@ -218,6 +216,7 @@ void DragonWaveAudioProcessor::processBlock(AudioBuffer<float> & buffer, MidiBuf
 			synth.addVoice(new WavetableVoice());
 	}
 
+	// Update synth voices with parameters
 	WavetableVoice* voice;
 	for (int i = 0; i < synth.getNumVoices(); i++)
 	{
@@ -229,6 +228,8 @@ void DragonWaveAudioProcessor::processBlock(AudioBuffer<float> & buffer, MidiBuf
 		}
 	}
 
+	// Render audio
+	buffer.clear();
 	synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 }
 
