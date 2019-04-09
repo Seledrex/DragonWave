@@ -14,6 +14,7 @@
 #include "PluginProcessor.h"
 #include "Oscilloscope.h"
 #include "CarrierOscillator.h"
+#include "Filter.h"
 
 //==============================================================================
 /**
@@ -35,6 +36,7 @@ private:
 	//==============================================================================
 	Oscilloscope carrierOscilloscopeGUI;
 	CarrierOscillator carrierOscGUI;
+	Filter carrierFilterGUI;
 
 	//==============================================================================
 	int frameCounter;

@@ -16,13 +16,15 @@
 DragonWaveAudioProcessorEditor::DragonWaveAudioProcessorEditor(DragonWaveAudioProcessor& p) :
 	AudioProcessorEditor(&p), processor(p),
 	carrierOscilloscopeGUI(p, Constants::CARRIER_OSCILLOSCOPE_TITLE),
-	carrierOscGUI(p)
+	carrierOscGUI(p),
+	carrierFilterGUI(p, Constants::CARRIER_FILTER_TITLE, Constants::CARRIER_FILTER_CUTOFF_ID, Constants::CARRIER_FILTER_Q_ID, Constants::CARRIER_FILTER_TYPE_ID)
 {
 	setSize(Constants::EDITOR_WIDTH, Constants::EDITOR_HEIGHT);
 	startTimerHz(60);
 
 	addAndMakeVisible(carrierOscilloscopeGUI);
 	addAndMakeVisible(carrierOscGUI);
+	addAndMakeVisible(carrierFilterGUI);
 }
 
 DragonWaveAudioProcessorEditor::~DragonWaveAudioProcessorEditor()
@@ -41,6 +43,7 @@ void DragonWaveAudioProcessorEditor::resized()
 
 	carrierOscilloscopeGUI.setBounds(column1.removeFromTop(Constants::COMPONENT_HEIGHT));
 	carrierOscGUI.setBounds(column1.removeFromTop(Constants::COMPONENT_HEIGHT));
+	carrierFilterGUI.setBounds(column1.removeFromTop(Constants::COMPONENT_HEIGHT));
 }
 
 //==============================================================================

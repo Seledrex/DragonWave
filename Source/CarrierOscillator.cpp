@@ -51,7 +51,7 @@ CarrierOscillator::CarrierOscillator(DragonWaveAudioProcessor& p) :
 
 	// Add in sliders
 	addAndMakeVisible(pitchSlider);
-	pitchSlider.setSliderStyle(Slider::SliderStyle::IncDecButtons);
+	pitchSlider.setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
 	pitchSlider.setTextBoxStyle(Slider::TextBoxRight, false, 30, 20);
 	pitchSlider.setRange(-24, 24, 1);
 
@@ -59,7 +59,6 @@ CarrierOscillator::CarrierOscillator(DragonWaveAudioProcessor& p) :
 	pitchLabel.setText(Constants::OSCILLATOR_PITCH_NAME, dontSendNotification);
 	pitchLabel.setJustificationType(Justification::centredRight);
 	pitchLabel.setColour(0, Colours::white);
-	pitchLabel.attachToComponent(&pitchSlider, true);
 
 	addAndMakeVisible(voicesSlider);
 	voicesSlider.setSliderStyle(Slider::SliderStyle::IncDecButtons);
@@ -70,7 +69,6 @@ CarrierOscillator::CarrierOscillator(DragonWaveAudioProcessor& p) :
 	voicesLabel.setText(Constants::OSCILLATOR_VOICES_NAME, dontSendNotification);
 	voicesLabel.setJustificationType(Justification::centredRight);
 	voicesLabel.setColour(0, Colours::white);
-	voicesLabel.attachToComponent(&voicesSlider, true);
 }
 
 CarrierOscillator::~CarrierOscillator()
@@ -87,7 +85,7 @@ void CarrierOscillator::paint (Graphics& g)
 	float areaWidth = (float)Constants::COMPONENT_WIDTH - 2 * Constants::PADDING;
 	float areaHeight = Constants::COMPONENT_HEIGHT - Constants::PADDING - areaY;
 	Rectangle<float> componentArea(areaX, areaY, areaWidth, areaHeight);
-
+	
 	// Fill background
 	g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
 
@@ -109,23 +107,23 @@ void CarrierOscillator::resized()
 	float areaY = (float)titleArea.getPosition().getY() + (float)titleArea.getHeight() + (float)Constants::PADDING;
 	float areaWidth = (float)Constants::COMPONENT_WIDTH - 2 * Constants::PADDING;
 	float areaHeight = Constants::COMPONENT_HEIGHT - Constants::PADDING - areaY;
-	Rectangle<float> componentArea(areaX, areaY, areaWidth, areaHeight);
+	Rectangle<float> componentAreaFloat(areaX, areaY, areaWidth, areaHeight);
 
 	// Convert to integer type and trim off sides
-	Rectangle<int> componentAreaInt = componentArea.toNearestInt().
+	Rectangle<int> componentArea = componentAreaFloat.toNearestInt().
 		withTrimmedLeft(Constants::PADDING).
-		withTrimmedRight(Constants::PADDING);
+		withTrimmedRight(Constants::PADDING).
+		withTrimmedTop(Constants::PADDING);
 
 	// Create button row 1 area
-	componentAreaInt.removeFromTop(Constants::PADDING);
-	auto buttonRow1 = componentAreaInt.removeFromTop(20);
+	auto buttonRow1 = componentArea.removeFromTop(20);
 
 	// Create button row 2 area
-	componentAreaInt.removeFromTop(2);
-	auto buttonRow2 = componentAreaInt.removeFromTop(20);
+	componentArea.removeFromTop(2);
+	auto buttonRow2 = componentArea.removeFromTop(20);
 
 	// Set bounds for each button
-	int buttonWidth = componentAreaInt.getWidth() / 5;
+	int buttonWidth = componentArea.getWidth() / 5;
 	sineButton.setBounds(buttonRow1.removeFromLeft(buttonWidth));
 	triangleButton.setBounds(buttonRow1.removeFromLeft(buttonWidth));
 	sawtoothButton.setBounds(buttonRow1.removeFromLeft(buttonWidth));
@@ -134,10 +132,15 @@ void CarrierOscillator::resized()
 	openButton.setBounds(buttonRow2);
 
 	// Calculate slider area and set bounds
-	auto sliderArea = componentAreaInt.withTrimmedTop(Constants::PADDING).withTrimmedBottom(Constants::PADDING);
-	int amount = sliderArea.getWidth() / 2;
-	pitchSlider.setBounds(sliderArea.removeFromLeft(amount).withTrimmedLeft(amount / 2));
-	voicesSlider.setBounds(sliderArea.removeFromLeft(amount).withTrimmedLeft(amount / 2));
+	float percent = 0.40f;
+	int labelWidth = roundToInt((float)componentArea.getWidth() * percent / 2.0f);
+	int sliderWidth = roundToInt((float)componentArea.getWidth() * (1.0f - percent) / 2.0f);
+
+	auto sliderArea = componentArea.withTrimmedTop(Constants::PADDING).withTrimmedBottom(Constants::PADDING);
+	pitchLabel.setBounds(sliderArea.removeFromLeft(labelWidth));
+	pitchSlider.setBounds(sliderArea.removeFromLeft(sliderWidth));
+	voicesLabel.setBounds(sliderArea.removeFromLeft(labelWidth));
+	voicesSlider.setBounds(sliderArea.removeFromLeft(sliderWidth));
 }
 
 //==============================================================================

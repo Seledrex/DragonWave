@@ -67,6 +67,8 @@ public:
 	AudioProcessorValueTreeState parameters;
 	WavetableSound* sound;
 	Synthesiser synth;
+	IIRFilter iirFilterLeft;
+	IIRFilter iirFilterRight;
 
 	//==============================================================================
 	int noteOnCount = 0;

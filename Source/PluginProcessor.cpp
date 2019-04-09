@@ -61,29 +61,35 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 	);
 	params.push_back(std::move(oscillatorVoices));
 
-	auto filterType = std::make_unique<AudioParameterChoice>(
-		Constants::FILTER_TYPE_ID,
-		Constants::FILTER_TYPE_NAME,
-		StringArray("Lowpass", "Highpass", "Bandpass"),
+	auto carrierFilterType = std::make_unique<AudioParameterChoice>(
+		Constants::CARRIER_FILTER_TYPE_ID,
+		Constants::CARRIER_FILTER_TYPE_NAME,
+		StringArray(
+			Constants::LOWPASS,
+			Constants::HIGHPASS,
+			Constants::BANDPASS,
+			Constants::BANDREJECT,
+			Constants::ALLPASS
+		),
 		0
 	);
-	params.push_back(std::move(filterType));
+	params.push_back(std::move(carrierFilterType));
 
-	auto filterCutoff = std::make_unique<AudioParameterFloat>(
-		Constants::FILTER_CUTOFF_ID,
-		Constants::FILTER_CUTOFF_NAME,
-		NormalisableRange<float>(20.0f, 22050.0f, 0.01f, 0.5f),
-		22050.0f
+	auto carrierFilterCutoff = std::make_unique<AudioParameterFloat>(
+		Constants::CARRIER_FILTER_CUTOFF_ID,
+		Constants::CARRIER_FILTER_CUTOFF_NAME,
+		NormalisableRange<float>(20.0f, 20000.0f, 0.01f, 0.5f),
+		20000.0f
 	);
-	params.push_back(std::move(filterCutoff));
+	params.push_back(std::move(carrierFilterCutoff));
 
-	auto filterQ = std::make_unique<AudioParameterFloat>(
-		Constants::FILTER_Q_ID,
-		Constants::FILTER_Q_NAME,
-		NormalisableRange<float>(1.0f, 5.0f, 1.0f),
+	auto carrierFilterQ = std::make_unique<AudioParameterFloat>(
+		Constants::CARRIER_FILTER_Q_ID,
+		Constants::CARRIER_FILTER_Q_NAME,
+		NormalisableRange<float>(0.5f, 10.0f),
 		1.0f
 	);
-	params.push_back(std::move(filterQ));
+	params.push_back(std::move(carrierFilterQ));
 
 	return { params.begin(), params.end() };
 }
@@ -228,9 +234,44 @@ void DragonWaveAudioProcessor::processBlock(AudioBuffer<float> & buffer, MidiBuf
 		}
 	}
 
-	// Render audio
+	// Render synth audio
 	buffer.clear();
 	synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+
+	// Apply filter
+	int type = (int)* parameters.getRawParameterValue(Constants::CARRIER_FILTER_TYPE_ID);
+	double cutoff = (double)* parameters.getRawParameterValue(Constants::CARRIER_FILTER_CUTOFF_ID);
+	double q = (double)* parameters.getRawParameterValue(Constants::CARRIER_FILTER_Q_ID);
+
+	switch (type)
+	{
+	case 0:
+		iirFilterLeft.setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), cutoff, q));
+		iirFilterRight.setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), cutoff, q));
+		break;
+	case 1:
+		iirFilterLeft.setCoefficients(IIRCoefficients::makeHighPass(getSampleRate(), cutoff, q));
+		iirFilterRight.setCoefficients(IIRCoefficients::makeHighPass(getSampleRate(), cutoff, q));
+		break;
+	case 2:
+		iirFilterLeft.setCoefficients(IIRCoefficients::makeBandPass(getSampleRate(), cutoff, q));
+		iirFilterRight.setCoefficients(IIRCoefficients::makeBandPass(getSampleRate(), cutoff, q));
+		break;
+	case 3:
+		iirFilterLeft.setCoefficients(IIRCoefficients::makeNotchFilter(getSampleRate(), cutoff, q));
+		iirFilterRight.setCoefficients(IIRCoefficients::makeNotchFilter(getSampleRate(), cutoff, q));
+		break;
+	case 4:
+		iirFilterLeft.setCoefficients(IIRCoefficients::makeAllPass(getSampleRate(), cutoff, q));
+		iirFilterRight.setCoefficients(IIRCoefficients::makeAllPass(getSampleRate(), cutoff, q));
+		break;
+	default:
+		iirFilterLeft.setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), cutoff, q));
+		iirFilterRight.setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), cutoff, q));
+	}
+
+	iirFilterLeft.processSamples(buffer.getWritePointer(0), buffer.getNumSamples());
+	iirFilterRight.processSamples(buffer.getWritePointer(1), buffer.getNumSamples());
 }
 
 //==============================================================================

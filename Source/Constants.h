@@ -21,12 +21,12 @@ public:
 	static const String OSCILLATOR_PITCH_NAME;
 	static const String OSCILLATOR_VOICES_ID;
 	static const String OSCILLATOR_VOICES_NAME;
-	static const String FILTER_TYPE_ID;
-	static const String FILTER_TYPE_NAME;
-	static const String FILTER_CUTOFF_ID;
-	static const String FILTER_CUTOFF_NAME;
-	static const String FILTER_Q_ID;
-	static const String FILTER_Q_NAME;
+	static const String CARRIER_FILTER_TYPE_ID;
+	static const String CARRIER_FILTER_TYPE_NAME;
+	static const String CARRIER_FILTER_CUTOFF_ID;
+	static const String CARRIER_FILTER_CUTOFF_NAME;
+	static const String CARRIER_FILTER_Q_ID;
+	static const String CARRIER_FILTER_Q_NAME;
 
 	//==============================================================================
 	static const int EDITOR_WIDTH;
@@ -40,6 +40,7 @@ public:
 	static const String FM_OSCILLOSCOPE_TITLE;
 	static const String CARRIER_OSCILLATOR_TITLE;
 	static const String FM_OSCILLATOR_TITLE;
+	static const String CARRIER_FILTER_TITLE;
 
 	//==============================================================================
 	static const String SINE;
@@ -51,5 +52,17 @@ public:
 	//==============================================================================
 	static const String OPEN_WAVETABLE;
 	static const String SELECT_WAVETABLE;
+
+	//==============================================================================
+	static const String LOWPASS;
+	static const String HIGHPASS;
+	static const String BANDPASS;
+	static const String BANDREJECT;
+	static const String ALLPASS;
+
+	//==============================================================================
+	static const String FILTER_TYPE;
+	static const String FILTER_CUTOFF;
+	static const String FILTER_Q;
 
 };
