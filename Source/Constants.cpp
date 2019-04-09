@@ -13,6 +13,10 @@
 //==============================================================================
 const String Constants::WAVEFORM_TYPE_ID = "waveformType";
 const String Constants::WAVETABLE_PATH_ID = "wavetablePath";
+const String Constants::OSCILLATOR_PITCH_ID = "oscillatorPitch";
+const String Constants::OSCILLATOR_PITCH_NAME = "Pitch";
+const String Constants::OSCILLATOR_VOICES_ID = "oscillatorVoices";
+const String Constants::OSCILLATOR_VOICES_NAME = "Voices";
 const String Constants::FILTER_TYPE_ID = "filterType";
 const String Constants::FILTER_TYPE_NAME = "Filter Type";
 const String Constants::FILTER_CUTOFF_ID = "filterCutoff";

@@ -26,6 +26,9 @@ public:
 	void pitchWheelMoved(int newPitchWheelValue) override;
 	void controllerMoved(int controllerNumber, int newControllerValue) override;
 
+	//==============================================================================
+	void setPitchShift(float* shift);
+
 private:
 	Random random;
 	WavetableSound* wavetableSound = nullptr;
@@ -38,6 +41,9 @@ private:
 	float tableDelta = 0.0f;
 	float level = 0.0f;
 	float wavetableMix = 0.0f;
+
+	//==============================================================================
+	int pitchShift = 0;
 
 	//==============================================================================
 	forcedinline float getNextSample() noexcept;

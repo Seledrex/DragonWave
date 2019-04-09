@@ -17,6 +17,10 @@ class Constants
 public:
 	static const String WAVEFORM_TYPE_ID;
 	static const String WAVETABLE_PATH_ID;
+	static const String OSCILLATOR_PITCH_ID;
+	static const String OSCILLATOR_PITCH_NAME;
+	static const String OSCILLATOR_VOICES_ID;
+	static const String OSCILLATOR_VOICES_NAME;
 	static const String FILTER_TYPE_ID;
 	static const String FILTER_TYPE_NAME;
 	static const String FILTER_CUTOFF_ID;

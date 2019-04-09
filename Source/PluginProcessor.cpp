@@ -28,7 +28,8 @@ DragonWaveAudioProcessor::DragonWaveAudioProcessor()
 #endif
 {
 	// Add voices to the synth
-	for (auto i = 0; i < 32; i++) {
+	int numVoices = (int)*parameters.getRawParameterValue(Constants::OSCILLATOR_VOICES_ID);
+	for (auto i = 0; i < numVoices; i++) {
 		synth.addVoice(new WavetableVoice());
 	}
 
@@ -45,6 +46,20 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 {
 	// Define parameters here
 	std::vector<std::unique_ptr<RangedAudioParameter>> params;
+
+	auto oscillatorPitch = std::make_unique<AudioParameterInt>(
+		Constants::OSCILLATOR_PITCH_ID,
+		Constants::OSCILLATOR_PITCH_NAME,
+		-24, 24, 0
+	);
+	params.push_back(std::move(oscillatorPitch));
+
+	auto oscillatorVoices = std::make_unique<AudioParameterInt>(
+		Constants::OSCILLATOR_VOICES_ID,
+		Constants::OSCILLATOR_VOICES_NAME,
+		1, 32, 8
+	);
+	params.push_back(std::move(oscillatorVoices));
 
 	auto filterType = std::make_unique<AudioParameterChoice>(
 		Constants::FILTER_TYPE_ID,
@@ -189,6 +204,30 @@ void DragonWaveAudioProcessor::processBlock(AudioBuffer<float> & buffer, MidiBuf
 	// Make sure count does not go negative!
 	if (noteOnCount < 0)
 		noteOnCount = 0;
+
+	int numVoices = (int)* parameters.getRawParameterValue(Constants::OSCILLATOR_VOICES_ID);
+	if (numVoices < synth.getNumVoices())
+	{
+		for (int i = synth.getNumVoices() - 1; i >= numVoices; i--)
+			synth.removeVoice(i);
+	}
+	else if (numVoices > synth.getNumVoices())
+	{
+		int numVoicesToAdd = numVoices - synth.getNumVoices();
+		for (int i = 0; i < numVoicesToAdd; i++)
+			synth.addVoice(new WavetableVoice());
+	}
+
+	WavetableVoice* voice;
+	for (int i = 0; i < synth.getNumVoices(); i++)
+	{
+		voice = dynamic_cast<WavetableVoice*>(synth.getVoice(i));
+
+		if (voice != nullptr)
+		{
+			voice->setPitchShift(parameters.getRawParameterValue(Constants::OSCILLATOR_PITCH_ID));
+		}
+	}
 
 	synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 }

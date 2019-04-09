@@ -38,6 +38,18 @@ private:
 	TextButton noiseButton;
 
 	//==============================================================================
+	Slider pitchSlider;
+	Slider voicesSlider;
+
+	//==============================================================================
+	Label pitchLabel;
+	Label voicesLabel;
+
+	//==============================================================================
+	std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> pitchAttach;
+	std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> voicesAttach;
+
+	//==============================================================================
 	void buttonClicked(Button* button);
 	void buttonStateChanged(Button* button);
 	void openButtonClicked();

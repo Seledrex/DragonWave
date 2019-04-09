@@ -18,29 +18,56 @@ CarrierOscillator::CarrierOscillator(DragonWaveAudioProcessor& p) :
 {
 	setSize(Constants::COMPONENT_WIDTH, Constants::COMPONENT_HEIGHT);
 
-	addAndMakeVisible(&openButton);
+	pitchAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(
+		processor.parameters, Constants::OSCILLATOR_PITCH_ID, pitchSlider);
+	voicesAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(
+		processor.parameters, Constants::OSCILLATOR_VOICES_ID, voicesSlider);
+
+	addAndMakeVisible(openButton);
 	openButton.setButtonText("Open wavetable...");
 	openButton.onClick = [this] { openButtonClicked(); };
 
-	addAndMakeVisible(&sineButton);
+	addAndMakeVisible(sineButton);
 	sineButton.setButtonText("Sine");
 	sineButton.addListener(this);
 
-	addAndMakeVisible(&triangleButton);
+	addAndMakeVisible(triangleButton);
 	triangleButton.setButtonText("Tri");
 	triangleButton.addListener(this);
 
-	addAndMakeVisible(&sawtoothButton);
+	addAndMakeVisible(sawtoothButton);
 	sawtoothButton.setButtonText("Saw");
 	sawtoothButton.addListener(this);
 
-	addAndMakeVisible(&squareButton);
+	addAndMakeVisible(squareButton);
 	squareButton.setButtonText("Square");
 	squareButton.addListener(this);
 
-	addAndMakeVisible(&noiseButton);
+	addAndMakeVisible(noiseButton);
 	noiseButton.setButtonText("Noise");
 	noiseButton.addListener(this);
+
+	addAndMakeVisible(pitchSlider);
+	pitchSlider.setSliderStyle(Slider::SliderStyle::IncDecButtons);
+	pitchSlider.setTextBoxStyle(Slider::TextBoxRight, false, 30, 20);
+	pitchSlider.setRange(-24, 24, 1);
+
+	addAndMakeVisible(pitchLabel);
+	pitchLabel.setText("Pitch", dontSendNotification);
+	pitchLabel.setJustificationType(Justification::centredRight);
+	pitchLabel.setColour(0, Colours::white);
+	pitchLabel.attachToComponent(&pitchSlider, true);
+
+	addAndMakeVisible(voicesSlider);
+	voicesSlider.setSliderStyle(Slider::SliderStyle::IncDecButtons);
+	voicesSlider.setTextBoxStyle(Slider::TextBoxRight, false, 30, 20);
+	voicesSlider.setRange(1, 32, 1);
+
+	addAndMakeVisible(voicesLabel);
+	voicesLabel.setText("Voices", dontSendNotification);
+	voicesLabel.setJustificationType(Justification::centredRight);
+	voicesLabel.setColour(0, Colours::white);
+	voicesLabel.attachToComponent(&voicesSlider, true);
 }
 
 CarrierOscillator::~CarrierOscillator()
@@ -78,26 +105,28 @@ void CarrierOscillator::resized()
 	float areaWidth = (float)Constants::COMPONENT_WIDTH - 2 * Constants::PADDING;
 	float areaHeight = Constants::COMPONENT_HEIGHT - Constants::PADDING - areaY;
 	Rectangle<float> componentArea(areaX, areaY, areaWidth, areaHeight);
-	Rectangle<int> componentAreaInt = componentArea.toNearestInt();
-
-	int buttonWidth = (componentAreaInt.getWidth() - Constants::PADDING * 2) / 5;
+	Rectangle<int> componentAreaInt = componentArea.toNearestInt().
+		withTrimmedLeft(Constants::PADDING).
+		withTrimmedRight(Constants::PADDING);
 
 	componentAreaInt.removeFromTop(Constants::PADDING);
-	Rectangle<int> buttonRow1 = componentAreaInt.removeFromTop(20).
-		withTrimmedLeft(Constants::PADDING).
-		withTrimmedRight(Constants::PADDING);
+	auto buttonRow1 = componentAreaInt.removeFromTop(20);
 
 	componentAreaInt.removeFromTop(2);
-	Rectangle<int> buttonRow2 = componentAreaInt.removeFromTop(20).
-		withTrimmedLeft(Constants::PADDING).
-		withTrimmedRight(Constants::PADDING);
+	auto buttonRow2 = componentAreaInt.removeFromTop(20);
 
+	int buttonWidth = componentAreaInt.getWidth() / 5;
 	sineButton.setBounds(buttonRow1.removeFromLeft(buttonWidth));
 	triangleButton.setBounds(buttonRow1.removeFromLeft(buttonWidth));
 	sawtoothButton.setBounds(buttonRow1.removeFromLeft(buttonWidth));
 	squareButton.setBounds(buttonRow1.removeFromLeft(buttonWidth));
 	noiseButton.setBounds(buttonRow1.removeFromLeft(buttonWidth));
 	openButton.setBounds(buttonRow2);
+
+	auto sliderArea = componentAreaInt.withTrimmedTop(Constants::PADDING).withTrimmedBottom(Constants::PADDING);
+	int amount = sliderArea.getWidth() / 2;
+	pitchSlider.setBounds(sliderArea.removeFromLeft(amount).withTrimmedLeft(amount / 2));
+	voicesSlider.setBounds(sliderArea.removeFromLeft(amount).withTrimmedLeft(amount / 2));
 }
 
 //==============================================================================

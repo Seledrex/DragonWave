@@ -27,7 +27,7 @@ void WavetableVoice::startNote(
 	int /*currentPitchWheelPosition*/)
 {
 	// Convert MIDI to frequency
-	float frequency = (float)MidiMessage::getMidiNoteInHertz(midiNoteNumber);
+	float frequency = (float)MidiMessage::getMidiNoteInHertz(midiNoteNumber + pitchShift);
 
 	// Get the wavetable information
 	wavetableSound = dynamic_cast<WavetableSound*>(sound);
@@ -91,6 +91,11 @@ void WavetableVoice::pitchWheelMoved(int /*newPitchWheelValue*/)
 
 void WavetableVoice::controllerMoved(int /*controllerNumber*/, int /*newControllerValue*/)
 {
+}
+
+void WavetableVoice::setPitchShift(float* shift)
+{
+	pitchShift = (int)*shift;
 }
 
 forcedinline float WavetableVoice::getNextSample() noexcept
