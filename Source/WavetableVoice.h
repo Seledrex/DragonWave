@@ -28,6 +28,7 @@ public:
 
 	//==============================================================================
 	void setPitchShift(float* shift);
+	void setFilterParams(float* type, float* cutoff, float* q);
 
 private:
 	Random random;
@@ -44,6 +45,9 @@ private:
 
 	//==============================================================================
 	int pitchShift = 0;
+
+	//==============================================================================
+	IIRFilter filter;
 
 	//==============================================================================
 	forcedinline float getNextSample() noexcept;

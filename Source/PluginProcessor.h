@@ -65,7 +65,6 @@ public:
 
 	//==============================================================================
 	AudioProcessorValueTreeState parameters;
-	WavetableSound* sound;
 	Synthesiser synth;
 	IIRFilter iirFilterLeft;
 	IIRFilter iirFilterRight;

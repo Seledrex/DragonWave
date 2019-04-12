@@ -231,47 +231,17 @@ void DragonWaveAudioProcessor::processBlock(AudioBuffer<float> & buffer, MidiBuf
 		if (voice != nullptr)
 		{
 			voice->setPitchShift(parameters.getRawParameterValue(Constants::OSCILLATOR_PITCH_ID));
+			voice->setFilterParams(
+				parameters.getRawParameterValue(Constants::CARRIER_FILTER_TYPE_ID),
+				parameters.getRawParameterValue(Constants::CARRIER_FILTER_CUTOFF_ID),
+				parameters.getRawParameterValue(Constants::CARRIER_FILTER_Q_ID)
+			);
 		}
 	}
 
 	// Render synth audio
 	buffer.clear();
 	synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
-
-	// Apply filter
-	int type = (int)* parameters.getRawParameterValue(Constants::CARRIER_FILTER_TYPE_ID);
-	double cutoff = (double)* parameters.getRawParameterValue(Constants::CARRIER_FILTER_CUTOFF_ID);
-	double q = (double)* parameters.getRawParameterValue(Constants::CARRIER_FILTER_Q_ID);
-
-	switch (type)
-	{
-	case 0:
-		iirFilterLeft.setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), cutoff, q));
-		iirFilterRight.setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), cutoff, q));
-		break;
-	case 1:
-		iirFilterLeft.setCoefficients(IIRCoefficients::makeHighPass(getSampleRate(), cutoff, q));
-		iirFilterRight.setCoefficients(IIRCoefficients::makeHighPass(getSampleRate(), cutoff, q));
-		break;
-	case 2:
-		iirFilterLeft.setCoefficients(IIRCoefficients::makeBandPass(getSampleRate(), cutoff, q));
-		iirFilterRight.setCoefficients(IIRCoefficients::makeBandPass(getSampleRate(), cutoff, q));
-		break;
-	case 3:
-		iirFilterLeft.setCoefficients(IIRCoefficients::makeNotchFilter(getSampleRate(), cutoff, q));
-		iirFilterRight.setCoefficients(IIRCoefficients::makeNotchFilter(getSampleRate(), cutoff, q));
-		break;
-	case 4:
-		iirFilterLeft.setCoefficients(IIRCoefficients::makeAllPass(getSampleRate(), cutoff, q));
-		iirFilterRight.setCoefficients(IIRCoefficients::makeAllPass(getSampleRate(), cutoff, q));
-		break;
-	default:
-		iirFilterLeft.setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), cutoff, q));
-		iirFilterRight.setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), cutoff, q));
-	}
-
-	iirFilterLeft.processSamples(buffer.getWritePointer(0), buffer.getNumSamples());
-	iirFilterRight.processSamples(buffer.getWritePointer(1), buffer.getNumSamples());
 }
 
 //==============================================================================

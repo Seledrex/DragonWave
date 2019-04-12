@@ -98,6 +98,34 @@ void WavetableVoice::setPitchShift(float* shift)
 	pitchShift = (int)*shift;
 }
 
+void WavetableVoice::setFilterParams(float* newType, float* newCutoff, float* newQ)
+{
+	int type = (int)* newType;
+	double cutoff = (double)* newCutoff;
+	double q = (double)* newQ;
+
+	switch (type)
+	{
+	case 0:
+		filter.setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), cutoff, q));
+		break;
+	case 1:
+		filter.setCoefficients(IIRCoefficients::makeHighPass(getSampleRate(), cutoff, q));
+		break;
+	case 2:
+		filter.setCoefficients(IIRCoefficients::makeBandPass(getSampleRate(), cutoff, q));
+		break;
+	case 3:
+		filter.setCoefficients(IIRCoefficients::makeNotchFilter(getSampleRate(), cutoff, q));
+		break;
+	case 4:
+		filter.setCoefficients(IIRCoefficients::makeAllPass(getSampleRate(), cutoff, q));
+		break;
+	default:
+		filter.setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), cutoff, q));
+	}
+}
+
 forcedinline float WavetableVoice::getNextSample() noexcept
 {
 	// Get the indexes that surround the current index estimate
@@ -125,5 +153,9 @@ forcedinline float WavetableVoice::getNextSample() noexcept
 
 	// Mix samples from both wavetables
 	auto currentSample = currentSampleLo * (1.0f - wavetableMix) + currentSampleHi * wavetableMix;
+
+	// Apply filter
+	currentSample = filter.processSingleSampleRaw(currentSample);
+
 	return currentSample;
 }
