@@ -15,6 +15,7 @@
 #include "Oscilloscope.h"
 #include "CarrierOscillator.h"
 #include "Filter.h"
+#include "Envelope.h"
 
 //==============================================================================
 /**
@@ -37,9 +38,10 @@ private:
 	Oscilloscope carrierOscilloscopeGUI;
 	CarrierOscillator carrierOscGUI;
 	Filter carrierFilterGUI;
+	Envelope carrierEnvGUI;
 
 	//==============================================================================
-	int frameCounter;
+	int frameCounter = 0;
 	void timerCallback() override;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DragonWaveAudioProcessorEditor)

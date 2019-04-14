@@ -45,6 +45,8 @@ void WavetableVoice::startNote(
 		wavetableMix = (frequency - boundingFrequencies.first) / (boundingFrequencies.second - boundingFrequencies.first);
 	else
 		wavetableMix = 1;
+
+	oscEnvelope.noteOn();
 }
 
 void WavetableVoice::renderNextBlock(AudioSampleBuffer & outputBuffer, int startSample, int numSamples)
@@ -56,8 +58,11 @@ void WavetableVoice::renderNextBlock(AudioSampleBuffer & outputBuffer, int start
 		{
 			while (--numSamples >= 0)
 			{
+				auto currentEnv = oscEnvelope.getNextSample();
+				auto currentSample = (random.nextFloat() * 2 - 1) * currentEnv * oscEnvLevel * level;
+
 				for (auto i = 0; i < outputBuffer.getNumChannels(); i++)
-					outputBuffer.addSample(i, startSample, (random.nextFloat() * 2 - 1) * level);
+					outputBuffer.addSample(i, startSample, currentSample);
 
 				startSample++;
 			}
@@ -67,7 +72,9 @@ void WavetableVoice::renderNextBlock(AudioSampleBuffer & outputBuffer, int start
 			while (--numSamples >= 0)
 			{
 				// Calculate current sample
-				auto currentSample = getNextSample() * level;
+				auto currentEnv = oscEnvelope.getNextSample();
+				auto currentSample = getNextSample() * currentEnv * oscEnvLevel * level;
+				
 
 				// Place sample into output buffer
 				for (auto i = 0; i < outputBuffer.getNumChannels(); i++)
@@ -79,10 +86,17 @@ void WavetableVoice::renderNextBlock(AudioSampleBuffer & outputBuffer, int start
 	}
 }
 
-void WavetableVoice::stopNote(float /*velocity*/, bool /*allowTailOff*/)
+void WavetableVoice::stopNote(float /*velocity*/, bool allowTailOff)
 {
-	clearCurrentNote();
-	tableDelta = 0;
+	if (allowTailOff)
+	{
+		oscEnvelope.noteOff();
+	}
+	else
+	{
+		clearCurrentNote();
+		tableDelta = 0;
+	}
 }
 
 void WavetableVoice::pitchWheelMoved(int /*newPitchWheelValue*/)
@@ -124,6 +138,13 @@ void WavetableVoice::setFilterParams(float* newType, float* newCutoff, float* ne
 	default:
 		filter.setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), cutoff, q));
 	}
+}
+
+void WavetableVoice::setOscEnvParams(float* newAttack, float* newDecay, float* newSustain, float* newRelease, float* newLevel)
+{
+	oscEnvelope.setSampleRate(getSampleRate());
+	oscEnvelope.setParameters({ *newAttack, *newDecay, *newSustain, *newRelease });
+	oscEnvLevel = *newLevel;
 }
 
 forcedinline float WavetableVoice::getNextSample() noexcept

@@ -52,10 +52,12 @@ void Oscilloscope::paint (Graphics& g)
 	int retainedNoteOnCount = processor.noteOnCount;
 
 	// Do not draw waveform if there is none to draw
-	if (retainedCurrentSound == nullptr)
+	if (retainedCurrentSound == nullptr) {
 		return;
-
+	}
+		
 	auto* sound = retainedCurrentSound->getSound();
+	jassert(sound->isInitialized());
 
 	// Create static waveform path
 	Path staticPath;

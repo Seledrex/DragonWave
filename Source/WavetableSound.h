@@ -53,6 +53,7 @@ public:
 	AudioSampleBuffer& getWavetables();
 	int getWavetableSize();
 	Waveform getWaveformType();
+	bool isInitialized();
 
 	//==============================================================================
 	std::pair<float, float> getBoundingFrequencies(float target);

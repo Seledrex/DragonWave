@@ -47,6 +47,9 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 	// Define parameters here
 	std::vector<std::unique_ptr<RangedAudioParameter>> params;
 
+	//==============================================================================
+	// Oscillator Params
+	//==============================================================================
 	auto oscillatorPitch = std::make_unique<AudioParameterInt>(
 		Constants::OSCILLATOR_PITCH_ID,
 		Constants::OSCILLATOR_PITCH_NAME,
@@ -61,6 +64,9 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 	);
 	params.push_back(std::move(oscillatorVoices));
 
+	//==============================================================================
+	// Carrier Filter Params
+	//==============================================================================
 	auto carrierFilterType = std::make_unique<AudioParameterChoice>(
 		Constants::CARRIER_FILTER_TYPE_ID,
 		Constants::CARRIER_FILTER_TYPE_NAME,
@@ -90,6 +96,49 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		1.0f
 	);
 	params.push_back(std::move(carrierFilterQ));
+
+	//==============================================================================
+	// Carrier Envelope Params
+	//==============================================================================
+	auto carrierEnvelopeAttack = std::make_unique<AudioParameterFloat>(
+		Constants::CARRIER_ENV_ATTACK_ID,
+		Constants::CARRIER_ENV_ATTACK_NAME,
+		NormalisableRange<float>(0.001f, 5.0f, 0.001f, 0.5f),
+		0.001f
+	);
+	params.push_back(std::move(carrierEnvelopeAttack));
+
+	auto carrierEnvelopeDecay = std::make_unique<AudioParameterFloat>(
+		Constants::CARRIER_ENV_DECAY_ID,
+		Constants::CARRIER_ENV_DECAY_NAME,
+		NormalisableRange<float>(0.001f, 5.0f, 0.001f, 0.5f),
+		0.001f
+	);
+	params.push_back(std::move(carrierEnvelopeDecay));
+
+	auto carrierEnvelopeSustain = std::make_unique<AudioParameterFloat>(
+		Constants::CARRIER_ENV_SUSTAIN_ID,
+		Constants::CARRIER_ENV_SUSTAIN_NAME,
+		NormalisableRange<float>(0.0f, 1.0f, 0.001f, 0.5f),
+		1.0f
+	);
+	params.push_back(std::move(carrierEnvelopeSustain));
+
+	auto carrierEnvelopeRelease = std::make_unique<AudioParameterFloat>(
+		Constants::CARRIER_ENV_RELEASE_ID,
+		Constants::CARRIER_ENV_RELEASE_NAME,
+		NormalisableRange<float>(0.001f, 5.0f, 0.001f, 0.5f),
+		0.001f
+	);
+	params.push_back(std::move(carrierEnvelopeRelease));
+
+	auto carrierEnvelopeLevel = std::make_unique<AudioParameterFloat>(
+		Constants::CARRIER_ENV_LEVEL_ID,
+		Constants::CARRIER_ENV_LEVEL_NAME,
+		NormalisableRange<float>(0.0f, 1.0f, 0.001f, 0.5f),
+		1.0f
+	);
+	params.push_back(std::move(carrierEnvelopeLevel));
 
 	return { params.begin(), params.end() };
 }
@@ -164,7 +213,7 @@ void DragonWaveAudioProcessor::prepareToPlay(double sampleRate, int /*samplesPer
 
 void DragonWaveAudioProcessor::releaseResources()
 {
-	currentSound = nullptr;
+	synth.allNotesOff(0, false);
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -230,11 +279,22 @@ void DragonWaveAudioProcessor::processBlock(AudioBuffer<float> & buffer, MidiBuf
 
 		if (voice != nullptr)
 		{
-			voice->setPitchShift(parameters.getRawParameterValue(Constants::OSCILLATOR_PITCH_ID));
+			voice->setPitchShift(
+				parameters.getRawParameterValue(Constants::OSCILLATOR_PITCH_ID)
+			);
+
 			voice->setFilterParams(
 				parameters.getRawParameterValue(Constants::CARRIER_FILTER_TYPE_ID),
 				parameters.getRawParameterValue(Constants::CARRIER_FILTER_CUTOFF_ID),
 				parameters.getRawParameterValue(Constants::CARRIER_FILTER_Q_ID)
+			);
+
+			voice->setOscEnvParams(
+				parameters.getRawParameterValue(Constants::CARRIER_ENV_ATTACK_ID),
+				parameters.getRawParameterValue(Constants::CARRIER_ENV_DECAY_ID),
+				parameters.getRawParameterValue(Constants::CARRIER_ENV_SUSTAIN_ID),
+				parameters.getRawParameterValue(Constants::CARRIER_ENV_RELEASE_ID),
+				parameters.getRawParameterValue(Constants::CARRIER_ENV_LEVEL_ID)
 			);
 		}
 	}

@@ -146,6 +146,7 @@ void WavetableSound::makeArbitrary(std::vector<float> inputWavetable)
 
 	updateWavetableMap();
 	type = Waveform::Arbitrary;
+	initialized = true;
 }
 
 void WavetableSound::makeSine()
@@ -176,6 +177,7 @@ void WavetableSound::makeSine()
 
 	updateWavetableMap();
 	type = Waveform::Sine;
+	initialized = true;
 }
 
 void WavetableSound::makeTriangle()
@@ -187,6 +189,7 @@ void WavetableSound::makeTriangle()
 	triangle.insert(triangle.end(), end.begin(), end.end());
 	makeArbitrary(triangle);
 	type = Waveform::Triangle;
+	initialized = true;
 }
 
 void WavetableSound::makeSawtooth()
@@ -196,6 +199,7 @@ void WavetableSound::makeSawtooth()
 	sawtooth.insert(sawtooth.end(), sawSecondHalf.begin(), sawSecondHalf.end());
 	makeArbitrary(sawtooth);
 	type = Waveform::Sawtooth;
+	initialized = true;
 }
 
 void WavetableSound::makeSquare()
@@ -207,6 +211,7 @@ void WavetableSound::makeSquare()
 
 	makeArbitrary(square);
 	type = Waveform::Square;
+	initialized = true;
 }
 
 void WavetableSound::makeNoise()
@@ -226,6 +231,7 @@ void WavetableSound::makeNoise()
 
 	updateWavetableMap();
 	type = Waveform::Noise;
+	initialized = true;
 }
 
 //==============================================================================
@@ -242,6 +248,11 @@ int WavetableSound::getWavetableSize()
 WavetableSound::Waveform WavetableSound::getWaveformType()
 {
 	return type;
+}
+
+bool WavetableSound::isInitialized()
+{
+	return initialized;
 }
 
 //==============================================================================

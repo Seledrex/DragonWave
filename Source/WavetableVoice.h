@@ -28,7 +28,8 @@ public:
 
 	//==============================================================================
 	void setPitchShift(float* shift);
-	void setFilterParams(float* type, float* cutoff, float* q);
+	void setFilterParams(float* newType, float* newCutoff, float* newQ);
+	void setOscEnvParams(float* newAttack, float* newDecay, float* newSustain, float* newRelease, float* newLevel);
 
 private:
 	Random random;
@@ -42,12 +43,14 @@ private:
 	float tableDelta = 0.0f;
 	float level = 0.0f;
 	float wavetableMix = 0.0f;
+	float oscEnvLevel = 0.0f;
 
 	//==============================================================================
 	int pitchShift = 0;
 
 	//==============================================================================
 	IIRFilter filter;
+	ADSR oscEnvelope;
 
 	//==============================================================================
 	forcedinline float getNextSample() noexcept;
