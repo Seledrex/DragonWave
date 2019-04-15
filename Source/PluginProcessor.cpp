@@ -146,15 +146,15 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 	auto fmOscFrequency = std::make_unique<AudioParameterFloat>(
 		Constants::FM_OSC_FREQUENCY_ID,
 		Constants::FM_OSC_FREQUENCY_NAME,
-		NormalisableRange<float>(0.1f, 5000.0f, 0.001f, 0.5f),
-		0.1f
+		NormalisableRange<float>(0.0f, 1.0f, 0.0001f, 0.5f),
+		0.5f
 	);
 	params.push_back(std::move(fmOscFrequency));
 
 	auto fmOscDepth = std::make_unique<AudioParameterFloat>(
 		Constants::FM_OSC_DEPTH_ID,
 		Constants::FM_OSC_DEPTH_NAME,
-		NormalisableRange<float>(0.0f, 5000.0f, 0.001f, 0.5f),
+		NormalisableRange<float>(0.0f, 1.0f, 0.0001f, 0.5f),
 		0.0f
 	);
 	params.push_back(std::move(fmOscDepth));

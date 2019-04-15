@@ -174,8 +174,19 @@ void WavetableVoice::setOscEnvParams(float* newAttack, float* newDecay, float* n
 
 void WavetableVoice::setFmOscParams(float* newFrequency, float* newDepth)
 {
-	fmFrequency = *newFrequency;
-	fmDepth = *newDepth;
+	// Update frequency modulation phase change
+	auto frequencyMultiplierRange = NormalisableRange<float>(0.125f, 3.0f);
+	float newFmFrequency = frequency * frequencyMultiplierRange.convertFrom0to1(*newFrequency);
+	fmTableDelta = newFmFrequency * wavetableSize / (float)getSampleRate();
+
+	// Update frequency modulation depth
+	if (frequency > 0.0f) {
+		auto depthRange = NormalisableRange<float>(0.0f, frequency);
+		fmDepth = depthRange.convertFrom0to1(*newDepth);
+	}
+	else
+		fmDepth = 0.0f;
+	
 }
 
 forcedinline float WavetableVoice::getNextSample() noexcept
