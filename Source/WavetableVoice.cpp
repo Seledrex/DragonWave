@@ -243,28 +243,4 @@ forcedinline void WavetableVoice::modulateFrequency() noexcept
 	// Calculate new frequency
 	float newFrequency = std::abs(frequency + currentSample * fmDepth);
 	carrierTableDelta = newFrequency * wavetableSize / (float)getSampleRate();
-
-	// Get bounding frequencies and indices
-	auto carrierBFs = carrier->getBoundingFrequencies(newFrequency);
-	carrierBIs = carrier->getBoundingIndexes(carrierBFs);
-
-	// Calculate carrier oscillator mixing proportions
-	if (carrierBFs.first != carrierBFs.second)
-		carrierWavetableMix = (newFrequency - carrierBFs.first) / (carrierBFs.second - carrierBFs.first);
-	else
-		carrierWavetableMix = 1;
-
-	/*
-	fmTableDelta = fmFrequency * wavetableSize / (float)getSampleRate();
-
-	// Get bounding frequencies and indices
-	auto fmBFs = fm->getBoundingFrequencies(fmFrequency);
-	fmBIs = fm->getBoundingIndexes(fmBFs);
-
-	// Calculate carrier oscillator mixing proportions
-	if (fmBFs.first != fmBFs.second)
-		fmWavetableMix = (fmFrequency - fmBFs.first) / (fmBFs.second - fmBFs.first);
-	else
-		fmWavetableMix = 1;
-		*/
 }
