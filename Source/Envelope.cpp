@@ -62,23 +62,23 @@ Envelope::Envelope(DragonWaveAudioProcessor& p, String title, String attackId, S
 	levelSlider.setTextValueSuffix("s");
 
 	addAndMakeVisible(attackLabel);
-	attackLabel.setText("A", dontSendNotification);
+	attackLabel.setText(Constants::ATTACK, dontSendNotification);
 	attackLabel.setJustificationType(Justification::centredBottom);
 
 	addAndMakeVisible(decayLabel);
-	decayLabel.setText("D", dontSendNotification);
+	decayLabel.setText(Constants::DECAY, dontSendNotification);
 	decayLabel.setJustificationType(Justification::centredBottom);
 
 	addAndMakeVisible(sustainLabel);
-	sustainLabel.setText("S", dontSendNotification);
+	sustainLabel.setText(Constants::SUSTAIN, dontSendNotification);
 	sustainLabel.setJustificationType(Justification::centredBottom);
 
 	addAndMakeVisible(releaseLabel);
-	releaseLabel.setText("R", dontSendNotification);
+	releaseLabel.setText(Constants::RELEASE, dontSendNotification);
 	releaseLabel.setJustificationType(Justification::centredBottom);
 
 	addAndMakeVisible(levelLabel);
-	levelLabel.setText("Level", dontSendNotification);
+	levelLabel.setText(Constants::LEVEL, dontSendNotification);
 	levelLabel.setJustificationType(Justification::centredBottom);
 
 	attackAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(

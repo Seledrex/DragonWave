@@ -15,12 +15,12 @@
 class Constants
 {
 public:
-	static const String WAVEFORM_TYPE_ID;
-	static const String WAVETABLE_PATH_ID;
-	static const String OSCILLATOR_PITCH_ID;
-	static const String OSCILLATOR_PITCH_NAME;
-	static const String OSCILLATOR_VOICES_ID;
-	static const String OSCILLATOR_VOICES_NAME;
+	static const String CARRIER_WAVEFORM_TYPE_ID;
+	static const String CARRIER_WAVETABLE_PATH_ID;
+	static const String CARRIER_OSC_PITCH_ID;
+	static const String CARRIER_OSC_PITCH_NAME;
+	static const String CARRIER_OSC_VOICES_ID;
+	static const String CARRIER_OSC_VOICES_NAME;
 	static const String CARRIER_FILTER_TYPE_ID;
 	static const String CARRIER_FILTER_TYPE_NAME;
 	static const String CARRIER_FILTER_CUTOFF_ID;
@@ -37,6 +37,12 @@ public:
 	static const String CARRIER_ENV_RELEASE_NAME;
 	static const String CARRIER_ENV_LEVEL_ID;
 	static const String CARRIER_ENV_LEVEL_NAME;
+	static const String FM_OSC_FREQUENCY_ID;
+	static const String FM_OSC_FREQUENCY_NAME;
+	static const String FM_OSC_DEPTH_ID;
+	static const String FM_OSC_DEPTH_NAME;
+	static const String FM_WAVEFORM_TYPE_ID;
+	static const String FM_WAVEFORM_PATH_ID;
 
 	//==============================================================================
 	static const int EDITOR_WIDTH;
@@ -76,4 +82,10 @@ public:
 	static const String FILTER_CUTOFF;
 	static const String FILTER_Q;
 
+	//==============================================================================
+	static const String ATTACK;
+	static const String DECAY;
+	static const String SUSTAIN;
+	static const String RELEASE;
+	static const String LEVEL;
 };

@@ -28,7 +28,7 @@ DragonWaveAudioProcessor::DragonWaveAudioProcessor()
 #endif
 {
 	// Add voices to the synth
-	int numVoices = (int)*parameters.getRawParameterValue(Constants::OSCILLATOR_VOICES_ID);
+	int numVoices = (int)*parameters.getRawParameterValue(Constants::CARRIER_OSC_VOICES_ID);
 	for (auto i = 0; i < numVoices; i++) {
 		synth.addVoice(new WavetableVoice());
 	}
@@ -51,15 +51,15 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 	// Oscillator Params
 	//==============================================================================
 	auto oscillatorPitch = std::make_unique<AudioParameterInt>(
-		Constants::OSCILLATOR_PITCH_ID,
-		Constants::OSCILLATOR_PITCH_NAME,
+		Constants::CARRIER_OSC_PITCH_ID,
+		Constants::CARRIER_OSC_PITCH_NAME,
 		-24, 24, 0
 	);
 	params.push_back(std::move(oscillatorPitch));
 
 	auto oscillatorVoices = std::make_unique<AudioParameterInt>(
-		Constants::OSCILLATOR_VOICES_ID,
-		Constants::OSCILLATOR_VOICES_NAME,
+		Constants::CARRIER_OSC_VOICES_ID,
+		Constants::CARRIER_OSC_VOICES_NAME,
 		1, 32, 8
 	);
 	params.push_back(std::move(oscillatorVoices));
@@ -258,7 +258,7 @@ void DragonWaveAudioProcessor::processBlock(AudioBuffer<float> & buffer, MidiBuf
 		noteOnCount = 0;
 
 	// Add or remove voices from the synth
-	int numVoices = (int)* parameters.getRawParameterValue(Constants::OSCILLATOR_VOICES_ID);
+	int numVoices = (int)* parameters.getRawParameterValue(Constants::CARRIER_OSC_VOICES_ID);
 	if (numVoices < synth.getNumVoices())
 	{
 		for (int i = synth.getNumVoices() - 1; i >= numVoices; i--)
@@ -280,7 +280,7 @@ void DragonWaveAudioProcessor::processBlock(AudioBuffer<float> & buffer, MidiBuf
 		if (voice != nullptr)
 		{
 			voice->setPitchShift(
-				parameters.getRawParameterValue(Constants::OSCILLATOR_PITCH_ID)
+				parameters.getRawParameterValue(Constants::CARRIER_OSC_PITCH_ID)
 			);
 
 			voice->setFilterParams(
@@ -324,13 +324,13 @@ void DragonWaveAudioProcessor::getStateInformation(MemoryBlock& destData)
 
 	// Include waveform choice
 	int enumVal = chosenWaveform;
-	xml->setAttribute(Constants::WAVEFORM_TYPE_ID, enumVal);
+	xml->setAttribute(Constants::CARRIER_WAVEFORM_TYPE_ID, enumVal);
 
 	// Include wavetable file path
 	if (currentSound != nullptr)
-		xml->setAttribute(Constants::WAVETABLE_PATH_ID, currentSound->getPath());
+		xml->setAttribute(Constants::CARRIER_WAVETABLE_PATH_ID, currentSound->getPath());
 	else
-		xml->setAttribute(Constants::WAVETABLE_PATH_ID, "");
+		xml->setAttribute(Constants::CARRIER_WAVETABLE_PATH_ID, "");
 
 	// Store parameters in the memory block
 	copyXmlToBinary(*xml, destData);
@@ -351,9 +351,9 @@ void DragonWaveAudioProcessor::setStateInformation(const void* data, int sizeInB
 			parameters.replaceState(ValueTree::fromXml(*xmlState));
 
 			// Get the chosen waveform and file path for the wavetable
-			int chosenWavefromIndex = std::stoi(xmlState->getStringAttribute(Constants::WAVEFORM_TYPE_ID).toStdString());
+			int chosenWavefromIndex = std::stoi(xmlState->getStringAttribute(Constants::CARRIER_WAVEFORM_TYPE_ID).toStdString());
 			chosenWaveform = static_cast<WavetableSound::Waveform>(chosenWavefromIndex);
-			chosenPath = xmlState->getStringAttribute(Constants::WAVETABLE_PATH_ID);
+			chosenPath = xmlState->getStringAttribute(Constants::CARRIER_WAVETABLE_PATH_ID);
 
 			// Notify the thread to load
 			loadingThread->notify();

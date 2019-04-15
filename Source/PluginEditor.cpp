@@ -17,7 +17,10 @@ DragonWaveAudioProcessorEditor::DragonWaveAudioProcessorEditor(DragonWaveAudioPr
 	AudioProcessorEditor(&p), processor(p),
 	carrierOscilloscopeGUI(p,
 		Constants::CARRIER_OSCILLOSCOPE_TITLE),
+	fmOscilloscopeGUI(p,
+		Constants::FM_OSCILLOSCOPE_TITLE),
 	carrierOscGUI(p),
+	fmOscGUI(p),
 	carrierFilterGUI(p,
 		Constants::CARRIER_FILTER_TITLE,
 		Constants::CARRIER_FILTER_CUTOFF_ID,
@@ -35,7 +38,9 @@ DragonWaveAudioProcessorEditor::DragonWaveAudioProcessorEditor(DragonWaveAudioPr
 	startTimerHz(60);
 
 	addAndMakeVisible(carrierOscilloscopeGUI);
+	addAndMakeVisible(fmOscilloscopeGUI);
 	addAndMakeVisible(carrierOscGUI);
+	addAndMakeVisible(fmOscGUI);
 	addAndMakeVisible(carrierFilterGUI);
 	addAndMakeVisible(carrierEnvGUI);
 }
@@ -52,19 +57,28 @@ void DragonWaveAudioProcessorEditor::paint(Graphics& g)
 
 void DragonWaveAudioProcessorEditor::resized()
 {
-	Rectangle<int> column1 = getLocalBounds().withTrimmedRight(Constants::COMPONENT_WIDTH * 2);
+	auto column1 = getLocalBounds().withTrimmedRight(Constants::COMPONENT_WIDTH * 2);
+	auto column2 = getLocalBounds().withTrimmedLeft(Constants::COMPONENT_WIDTH).withTrimmedRight(Constants::COMPONENT_WIDTH);
 
+	// Set up column one components
 	carrierOscilloscopeGUI.setBounds(column1.removeFromTop(Constants::COMPONENT_HEIGHT));
 	carrierOscGUI.setBounds(column1.removeFromTop(Constants::COMPONENT_HEIGHT));
 	carrierFilterGUI.setBounds(column1.removeFromTop(Constants::COMPONENT_HEIGHT));
 	carrierEnvGUI.setBounds(column1.removeFromTop(Constants::COMPONENT_HEIGHT));
+
+	// Set up column two components
+	fmOscilloscopeGUI.setBounds(column2.removeFromTop(Constants::COMPONENT_HEIGHT));
+	fmOscGUI.setBounds(column2.removeFromTop(Constants::COMPONENT_HEIGHT));
 }
 
 //==============================================================================
 void DragonWaveAudioProcessorEditor::timerCallback()
 {
 	carrierOscilloscopeGUI.setSound(ReferenceCountedSound::Ptr(processor.currentSound));
+	fmOscilloscopeGUI.setSound(ReferenceCountedSound::Ptr(processor.currentSound));
 	carrierOscilloscopeGUI.incrementFrameCount();
+	fmOscilloscopeGUI.incrementFrameCount();
 	carrierOscilloscopeGUI.repaint();
+	fmOscilloscopeGUI.repaint();
 }
 

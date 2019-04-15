@@ -42,6 +42,9 @@
             file="Source/CarrierOscillator.cpp"/>
       <FILE id="AxbUd4" name="CarrierOscillator.h" compile="0" resource="0"
             file="Source/CarrierOscillator.h"/>
+      <FILE id="wGEr8e" name="FMOscillator.cpp" compile="1" resource="0"
+            file="Source/FMOscillator.cpp"/>
+      <FILE id="xzgPWI" name="FMOscillator.h" compile="0" resource="0" file="Source/FMOscillator.h"/>
       <FILE id="Vjfjn5" name="Envelope.cpp" compile="1" resource="0" file="Source/Envelope.cpp"/>
       <FILE id="zmcgUk" name="Envelope.h" compile="0" resource="0" file="Source/Envelope.h"/>
       <FILE id="txNEvp" name="Filter.cpp" compile="1" resource="0" file="Source/Filter.cpp"/>

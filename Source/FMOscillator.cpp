@@ -1,28 +1,28 @@
 /*
   ==============================================================================
 
-    CarrierOscillator.cpp
-    Created: 8 Apr 2019 2:31:17am
+    FMOscillator.cpp
+    Created: 14 Apr 2019 7:48:06pm
     Author:  Eric
 
   ==============================================================================
 */
 
 #include "PluginProcessor.h"
-#include "CarrierOscillator.h"
+#include "FMOscillator.h"
 #include "LoadingThread.h"
 
 //==============================================================================
-CarrierOscillator::CarrierOscillator(DragonWaveAudioProcessor& p) :
+FMOscillator::FMOscillator(DragonWaveAudioProcessor& p) :
 	processor(p)
 {
 	setSize(Constants::COMPONENT_WIDTH, Constants::COMPONENT_HEIGHT);
 
 	// Set up slider attachments
-	pitchAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(
-		processor.parameters, Constants::CARRIER_OSC_PITCH_ID, pitchSlider);
-	voicesAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(
-		processor.parameters, Constants::CARRIER_OSC_VOICES_ID, voicesSlider);
+	fmFrequencyAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(
+		processor.parameters, Constants::FM_OSC_FREQUENCY_ID, fmFrequencySlider);
+	fmDepthAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(
+		processor.parameters, Constants::FM_OSC_DEPTH_ID, fmDepthSlider);
 
 	// Add in buttons
 	addAndMakeVisible(openButton);
@@ -50,32 +50,34 @@ CarrierOscillator::CarrierOscillator(DragonWaveAudioProcessor& p) :
 	noiseButton.addListener(this);
 
 	// Add in sliders
-	addAndMakeVisible(pitchSlider);
-	pitchSlider.setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
-	pitchSlider.setTextBoxStyle(Slider::TextBoxRight, false, 30, 20);
-	pitchSlider.setRange(-24, 24, 1);
+	addAndMakeVisible(fmFrequencySlider);
+	fmFrequencySlider.setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
+	fmFrequencySlider.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
+	fmFrequencySlider.setRange(0.1f, 11025.0f, 0.001f);
+	fmFrequencySlider.setSkewFactor(0.5f);
 
-	addAndMakeVisible(pitchLabel);
-	pitchLabel.setText(Constants::CARRIER_OSC_PITCH_NAME, dontSendNotification);
-	pitchLabel.setJustificationType(Justification::centredRight);
-	pitchLabel.setColour(0, Colours::white);
+	addAndMakeVisible(fmFrequencyLabel);
+	fmFrequencyLabel.setText(Constants::FM_OSC_FREQUENCY_NAME, dontSendNotification);
+	fmFrequencyLabel.setJustificationType(Justification::centredRight);
+	fmFrequencyLabel.setColour(0, Colours::white);
 
-	addAndMakeVisible(voicesSlider);
-	voicesSlider.setSliderStyle(Slider::SliderStyle::IncDecButtons);
-	voicesSlider.setTextBoxStyle(Slider::TextBoxRight, false, 30, 20);
-	voicesSlider.setRange(1, 32, 1);
+	addAndMakeVisible(fmDepthSlider);
+	fmDepthSlider.setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
+	fmDepthSlider.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
+	fmDepthSlider.setRange(0.0f, 11025.0f, 0.001f);
+	fmDepthSlider.setSkewFactor(0.5f);
 
-	addAndMakeVisible(voicesLabel);
-	voicesLabel.setText(Constants::CARRIER_OSC_VOICES_NAME, dontSendNotification);
-	voicesLabel.setJustificationType(Justification::centredRight);
-	voicesLabel.setColour(0, Colours::white);
+	addAndMakeVisible(fmDepthLabel);
+	fmDepthLabel.setText(Constants::FM_OSC_DEPTH_NAME, dontSendNotification);
+	fmDepthLabel.setJustificationType(Justification::centredRight);
+	fmDepthLabel.setColour(0, Colours::white);
 }
 
-CarrierOscillator::~CarrierOscillator()
+FMOscillator::~FMOscillator()
 {
 }
 
-void CarrierOscillator::paint (Graphics& g)
+void FMOscillator::paint (Graphics& g)
 {
 	Rectangle<int> titleArea(0, Constants::PADDING, getWidth(), 20);
 
@@ -85,20 +87,20 @@ void CarrierOscillator::paint (Graphics& g)
 	float areaWidth = (float)Constants::COMPONENT_WIDTH - 2 * Constants::PADDING;
 	float areaHeight = Constants::COMPONENT_HEIGHT - Constants::PADDING - areaY;
 	Rectangle<float> componentArea(areaX, areaY, areaWidth, areaHeight);
-	
+
 	// Fill background
 	g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
 
 	// Draw title text
 	g.setColour(Colours::white);
-	g.drawText(Constants::CARRIER_OSCILLATOR_TITLE, titleArea, Justification::centred);
+	g.drawText(Constants::FM_OSCILLATOR_TITLE, titleArea, Justification::centred);
 
 	// Draw border
 	g.setColour(Colours::white);
 	g.drawRoundedRectangle(componentArea, (float)Constants::PADDING, 2.0f);
 }
 
-void CarrierOscillator::resized()
+void FMOscillator::resized()
 {
 	Rectangle<int> titleArea(0, Constants::PADDING, getWidth(), 20);
 
@@ -132,19 +134,19 @@ void CarrierOscillator::resized()
 	openButton.setBounds(buttonRow2);
 
 	// Calculate slider area and set bounds
-	float percent = 0.40f;
+	float percent = 0.30f;
 	int labelWidth = roundToInt((float)componentArea.getWidth() * percent / 2.0f);
 	int sliderWidth = roundToInt((float)componentArea.getWidth() * (1.0f - percent) / 2.0f);
 
-	auto sliderArea = componentArea.withTrimmedTop(Constants::PADDING).withTrimmedBottom(Constants::PADDING);
-	pitchLabel.setBounds(sliderArea.removeFromLeft(labelWidth));
-	pitchSlider.setBounds(sliderArea.removeFromLeft(sliderWidth));
-	voicesLabel.setBounds(sliderArea.removeFromLeft(labelWidth));
-	voicesSlider.setBounds(sliderArea.removeFromLeft(sliderWidth));
+	auto sliderArea = componentArea;
+	fmFrequencyLabel.setBounds(sliderArea.removeFromLeft(labelWidth));
+	fmFrequencySlider.setBounds(sliderArea.removeFromLeft(sliderWidth));
+	fmDepthLabel.setBounds(sliderArea.removeFromLeft(labelWidth));
+	fmDepthSlider.setBounds(sliderArea.removeFromLeft(sliderWidth));
 }
 
 //==============================================================================
-void CarrierOscillator::buttonClicked(Button* button)
+void FMOscillator::buttonClicked(Button* button)
 {
 	WavetableSound::Waveform type;
 
@@ -165,11 +167,11 @@ void CarrierOscillator::buttonClicked(Button* button)
 	processor.loadingThread->notify();
 }
 
-void CarrierOscillator::buttonStateChanged(Button* /*button*/)
+void FMOscillator::buttonStateChanged(Button* /*button*/)
 {
 }
 
-void CarrierOscillator::openButtonClicked()
+void FMOscillator::openButtonClicked()
 {
 	FileChooser chooser(Constants::SELECT_WAVETABLE, {}, "*.wav");
 

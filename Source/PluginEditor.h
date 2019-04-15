@@ -14,6 +14,7 @@
 #include "PluginProcessor.h"
 #include "Oscilloscope.h"
 #include "CarrierOscillator.h"
+#include "FMOscillator.h"
 #include "Filter.h"
 #include "Envelope.h"
 
@@ -36,7 +37,11 @@ private:
 
 	//==============================================================================
 	Oscilloscope carrierOscilloscopeGUI;
+	Oscilloscope fmOscilloscopeGUI;
+
 	CarrierOscillator carrierOscGUI;
+	FMOscillator fmOscGUI;
+
 	Filter carrierFilterGUI;
 	Envelope carrierEnvGUI;
 

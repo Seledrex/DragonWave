@@ -11,12 +11,12 @@
 #include "Constants.h"
 
 //==============================================================================
-const String Constants::WAVEFORM_TYPE_ID = "waveformType";
-const String Constants::WAVETABLE_PATH_ID = "wavetablePath";
-const String Constants::OSCILLATOR_PITCH_ID = "oscillatorPitch";
-const String Constants::OSCILLATOR_PITCH_NAME = "Pitch";
-const String Constants::OSCILLATOR_VOICES_ID = "oscillatorVoices";
-const String Constants::OSCILLATOR_VOICES_NAME = "Voices";
+const String Constants::CARRIER_WAVEFORM_TYPE_ID = "carrierWaveformType";
+const String Constants::CARRIER_WAVETABLE_PATH_ID = "carrierWavetablePath";
+const String Constants::CARRIER_OSC_PITCH_ID = "carrierOscPitch";
+const String Constants::CARRIER_OSC_PITCH_NAME = "Pitch";
+const String Constants::CARRIER_OSC_VOICES_ID = "carrierOscVoices";
+const String Constants::CARRIER_OSC_VOICES_NAME = "Voices";
 const String Constants::CARRIER_FILTER_TYPE_ID = "carrierFilterType";
 const String Constants::CARRIER_FILTER_TYPE_NAME = "CF Type";
 const String Constants::CARRIER_FILTER_CUTOFF_ID = "carrierFilterCutoff";
@@ -33,6 +33,12 @@ const String Constants::CARRIER_ENV_RELEASE_ID = "carrierEnvRelease";
 const String Constants::CARRIER_ENV_RELEASE_NAME = "CE Release";
 const String Constants::CARRIER_ENV_LEVEL_ID = "carrierEnvLevel";
 const String Constants::CARRIER_ENV_LEVEL_NAME = "CE Level";
+const String Constants::FM_OSC_FREQUENCY_ID = "fmOscFrequency";
+const String Constants::FM_OSC_FREQUENCY_NAME = "FM Freq";
+const String Constants::FM_OSC_DEPTH_ID = "fmOscDepth";
+const String Constants::FM_OSC_DEPTH_NAME = "FM Depth";
+const String Constants::FM_WAVEFORM_TYPE_ID = "fmWaveformType";
+const String Constants::FM_WAVEFORM_PATH_ID = "fmWaveformPath";
 
 //==============================================================================
 const int Constants::EDITOR_WIDTH = 900;
@@ -71,3 +77,10 @@ const String Constants::ALLPASS = "Allpass";
 const String Constants::FILTER_TYPE = "Type";
 const String Constants::FILTER_CUTOFF = "Cutoff";
 const String Constants::FILTER_Q = "Q";
+
+//==============================================================================
+const String Constants::ATTACK = "Attack";
+const String Constants::DECAY = "Decay";
+const String Constants::SUSTAIN = "Sustain";
+const String Constants::RELEASE = "Release";
+const String Constants::LEVEL = "Level";
