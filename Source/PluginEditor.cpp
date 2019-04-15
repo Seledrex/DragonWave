@@ -26,6 +26,12 @@ DragonWaveAudioProcessorEditor::DragonWaveAudioProcessorEditor(DragonWaveAudioPr
 		Constants::CARRIER_FILTER_CUTOFF_ID,
 		Constants::CARRIER_FILTER_Q_ID,
 		Constants::CARRIER_FILTER_TYPE_ID),
+	fmFilterGUI(p,
+		Constants::FM_FILTER_TITLE,
+		Constants::FM_FILTER_CUTOFF_ID,
+		Constants::FM_FILTER_Q_ID,
+		Constants::FM_FILTER_TYPE_ID
+	),
 	carrierEnvGUI(p,
 		Constants::CARRIER_ENV_TITLE,
 		Constants::CARRIER_ENV_ATTACK_ID,
@@ -38,11 +44,13 @@ DragonWaveAudioProcessorEditor::DragonWaveAudioProcessorEditor(DragonWaveAudioPr
 	startTimerHz(60);
 
 	addAndMakeVisible(carrierOscilloscopeGUI);
-	addAndMakeVisible(fmOscilloscopeGUI);
 	addAndMakeVisible(carrierOscGUI);
-	addAndMakeVisible(fmOscGUI);
 	addAndMakeVisible(carrierFilterGUI);
 	addAndMakeVisible(carrierEnvGUI);
+
+	addAndMakeVisible(fmOscilloscopeGUI);
+	addAndMakeVisible(fmOscGUI);
+	addAndMakeVisible(fmFilterGUI);
 }
 
 DragonWaveAudioProcessorEditor::~DragonWaveAudioProcessorEditor()
@@ -69,6 +77,7 @@ void DragonWaveAudioProcessorEditor::resized()
 	// Set up column two components
 	fmOscilloscopeGUI.setBounds(column2.removeFromTop(Constants::COMPONENT_HEIGHT));
 	fmOscGUI.setBounds(column2.removeFromTop(Constants::COMPONENT_HEIGHT));
+	fmFilterGUI.setBounds(column2.removeFromTop(Constants::COMPONENT_HEIGHT));
 }
 
 //==============================================================================
@@ -76,8 +85,10 @@ void DragonWaveAudioProcessorEditor::timerCallback()
 {
 	carrierOscilloscopeGUI.setSound(ReferenceCountedWavetable::Ptr(processor.currentCarrierWavetable));
 	fmOscilloscopeGUI.setSound(ReferenceCountedWavetable::Ptr(processor.currentFMWavetable));
+
 	carrierOscilloscopeGUI.incrementFrameCount();
 	fmOscilloscopeGUI.incrementFrameCount();
+
 	carrierOscilloscopeGUI.repaint();
 	fmOscilloscopeGUI.repaint();
 }

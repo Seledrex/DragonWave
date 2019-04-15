@@ -27,10 +27,13 @@ public:
 	void controllerMoved(int controllerNumber, int newControllerValue) override;
 
 	//==============================================================================
-	void setPitchShift(float* shift);
-	void setFilterParams(float* newType, float* newCutoff, float* newQ);
+	void setOscPitchShift(float* shift);
+	void setOscFilterParams(float* newType, float* newCutoff, float* newQ);
 	void setOscEnvParams(float* newAttack, float* newDecay, float* newSustain, float* newRelease, float* newLevel);
+	
+	//==============================================================================
 	void setFmOscParams(float* newFrequency, float* newDepth);
+	void setFmFilterParams(float* newType, float* newCutoff, float* newQ);
 
 private:
 
@@ -62,7 +65,8 @@ private:
 
 	//==============================================================================
 	Random random;
-	IIRFilter filter;
+	IIRFilter carrierFilter;
+	IIRFilter fmFilter;
 	ADSR oscEnvelope;
 
 	//==============================================================================

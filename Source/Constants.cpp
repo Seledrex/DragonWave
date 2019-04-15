@@ -33,12 +33,20 @@ const String Constants::CARRIER_ENV_RELEASE_ID = "carrierEnvRelease";
 const String Constants::CARRIER_ENV_RELEASE_NAME = "CE Release";
 const String Constants::CARRIER_ENV_LEVEL_ID = "carrierEnvLevel";
 const String Constants::CARRIER_ENV_LEVEL_NAME = "CE Level";
+
+//==============================================================================
+const String Constants::FM_WAVEFORM_TYPE_ID = "fmWaveformType";
+const String Constants::FM_WAVEFORM_PATH_ID = "fmWaveformPath";
 const String Constants::FM_OSC_FREQUENCY_ID = "fmOscFrequency";
 const String Constants::FM_OSC_FREQUENCY_NAME = "FM Freq";
 const String Constants::FM_OSC_DEPTH_ID = "fmOscDepth";
 const String Constants::FM_OSC_DEPTH_NAME = "FM Depth";
-const String Constants::FM_WAVEFORM_TYPE_ID = "fmWaveformType";
-const String Constants::FM_WAVEFORM_PATH_ID = "fmWaveformPath";
+const String Constants::FM_FILTER_TYPE_ID = "fmFilterType";
+const String Constants::FM_FILTER_TYPE_NAME = "FMF Type";
+const String Constants::FM_FILTER_CUTOFF_ID = "fmFilterCutoff";
+const String Constants::FM_FILTER_CUTOFF_NAME = "FMF Cutoff";
+const String Constants::FM_FILTER_Q_ID = "fmFilterQ";
+const String Constants::FM_FILTER_Q_NAME = "FMF Q";
 
 //==============================================================================
 const int Constants::EDITOR_WIDTH = 900;
@@ -49,11 +57,14 @@ const int Constants::PADDING = 10;
 
 //==============================================================================
 const String Constants::CARRIER_OSCILLOSCOPE_TITLE = "Carrier Oscillator";
-const String Constants::FM_OSCILLOSCOPE_TITLE = "FM Oscillator";
 const String Constants::CARRIER_OSCILLATOR_TITLE = "Carrier Oscillator Settings";
-const String Constants::FM_OSCILLATOR_TITLE = "FM Oscillator Settings";
 const String Constants::CARRIER_FILTER_TITLE = "Carrier Filter";
 const String Constants::CARRIER_ENV_TITLE = "Carrier Envelope";
+
+//==============================================================================
+const String Constants::FM_OSCILLOSCOPE_TITLE = "FM Oscillator";
+const String Constants::FM_OSCILLATOR_TITLE = "FM Oscillator Settings";
+const String Constants::FM_FILTER_TITLE = "FM Filter";
 
 //==============================================================================
 const String Constants::SINE = "Sin";

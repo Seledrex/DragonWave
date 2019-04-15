@@ -43,6 +43,8 @@ private:
 	FMOscillator fmOscGUI;
 
 	Filter carrierFilterGUI;
+	Filter fmFilterGUI;
+
 	Envelope carrierEnvGUI;
 
 	//==============================================================================

@@ -159,6 +159,39 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 	);
 	params.push_back(std::move(fmOscDepth));
 
+	//==============================================================================
+	// FM Filter Params
+	//==============================================================================
+	auto fmFilterType = std::make_unique<AudioParameterChoice>(
+		Constants::FM_FILTER_TYPE_ID,
+		Constants::FM_FILTER_TYPE_NAME,
+		StringArray(
+			Constants::LOWPASS,
+			Constants::HIGHPASS,
+			Constants::BANDPASS,
+			Constants::BANDREJECT,
+			Constants::ALLPASS
+		),
+		0
+	);
+	params.push_back(std::move(fmFilterType));
+
+	auto fmFilterCutoff = std::make_unique<AudioParameterFloat>(
+		Constants::FM_FILTER_CUTOFF_ID,
+		Constants::FM_FILTER_CUTOFF_NAME,
+		NormalisableRange<float>(20.0f, 20000.0f, 0.01f, 0.5f),
+		20000.0f
+	);
+	params.push_back(std::move(fmFilterCutoff));
+
+	auto fmFilterQ = std::make_unique<AudioParameterFloat>(
+		Constants::FM_FILTER_Q_ID,
+		Constants::FM_FILTER_Q_NAME,
+		NormalisableRange<float>(0.5f, 10.0f),
+		1.0f
+	);
+	params.push_back(std::move(fmFilterQ));
+
 	return { params.begin(), params.end() };
 }
 
@@ -298,11 +331,11 @@ void DragonWaveAudioProcessor::processBlock(AudioBuffer<float> & buffer, MidiBuf
 
 		if (voice != nullptr)
 		{
-			voice->setPitchShift(
+			voice->setOscPitchShift(
 				parameters.getRawParameterValue(Constants::CARRIER_OSC_PITCH_ID)
 			);
 
-			voice->setFilterParams(
+			voice->setOscFilterParams(
 				parameters.getRawParameterValue(Constants::CARRIER_FILTER_TYPE_ID),
 				parameters.getRawParameterValue(Constants::CARRIER_FILTER_CUTOFF_ID),
 				parameters.getRawParameterValue(Constants::CARRIER_FILTER_Q_ID)
@@ -319,6 +352,12 @@ void DragonWaveAudioProcessor::processBlock(AudioBuffer<float> & buffer, MidiBuf
 			voice->setFmOscParams(
 				parameters.getRawParameterValue(Constants::FM_OSC_FREQUENCY_ID),
 				parameters.getRawParameterValue(Constants::FM_OSC_DEPTH_ID)
+			);
+
+			voice->setFmFilterParams(
+				parameters.getRawParameterValue(Constants::FM_FILTER_TYPE_ID),
+				parameters.getRawParameterValue(Constants::FM_FILTER_CUTOFF_ID),
+				parameters.getRawParameterValue(Constants::FM_FILTER_Q_ID)
 			);
 		}
 	}

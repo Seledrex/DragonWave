@@ -15,6 +15,8 @@
 class Constants
 {
 public:
+
+	//==============================================================================
 	static const String CARRIER_WAVEFORM_TYPE_ID;
 	static const String CARRIER_WAVETABLE_PATH_ID;
 	static const String CARRIER_OSC_PITCH_ID;
@@ -37,12 +39,20 @@ public:
 	static const String CARRIER_ENV_RELEASE_NAME;
 	static const String CARRIER_ENV_LEVEL_ID;
 	static const String CARRIER_ENV_LEVEL_NAME;
+
+	//==============================================================================
+	static const String FM_WAVEFORM_TYPE_ID;
+	static const String FM_WAVEFORM_PATH_ID;
 	static const String FM_OSC_FREQUENCY_ID;
 	static const String FM_OSC_FREQUENCY_NAME;
 	static const String FM_OSC_DEPTH_ID;
 	static const String FM_OSC_DEPTH_NAME;
-	static const String FM_WAVEFORM_TYPE_ID;
-	static const String FM_WAVEFORM_PATH_ID;
+	static const String FM_FILTER_TYPE_ID;
+	static const String FM_FILTER_TYPE_NAME;
+	static const String FM_FILTER_CUTOFF_ID;
+	static const String FM_FILTER_CUTOFF_NAME;
+	static const String FM_FILTER_Q_ID;
+	static const String FM_FILTER_Q_NAME;
 
 	//==============================================================================
 	static const int EDITOR_WIDTH;
@@ -53,11 +63,14 @@ public:
 
 	//==============================================================================
 	static const String CARRIER_OSCILLOSCOPE_TITLE;
-	static const String FM_OSCILLOSCOPE_TITLE;
 	static const String CARRIER_OSCILLATOR_TITLE;
-	static const String FM_OSCILLATOR_TITLE;
 	static const String CARRIER_FILTER_TITLE;
 	static const String CARRIER_ENV_TITLE;
+
+	//==============================================================================
+	static const String FM_OSCILLOSCOPE_TITLE;
+	static const String FM_OSCILLATOR_TITLE;
+	static const String FM_FILTER_TITLE;
 
 	//==============================================================================
 	static const String SINE;

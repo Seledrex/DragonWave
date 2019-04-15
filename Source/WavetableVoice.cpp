@@ -132,12 +132,12 @@ void WavetableVoice::controllerMoved(int /*controllerNumber*/, int /*newControll
 {
 }
 
-void WavetableVoice::setPitchShift(float* shift)
+void WavetableVoice::setOscPitchShift(float* shift)
 {
 	pitchShift = (int)*shift;
 }
 
-void WavetableVoice::setFilterParams(float* newType, float* newCutoff, float* newQ)
+void WavetableVoice::setOscFilterParams(float* newType, float* newCutoff, float* newQ)
 {
 	int type = (int)* newType;
 	double cutoff = (double)* newCutoff;
@@ -146,22 +146,22 @@ void WavetableVoice::setFilterParams(float* newType, float* newCutoff, float* ne
 	switch (type)
 	{
 	case 0:
-		filter.setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), cutoff, q));
+		carrierFilter.setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), cutoff, q));
 		break;
 	case 1:
-		filter.setCoefficients(IIRCoefficients::makeHighPass(getSampleRate(), cutoff, q));
+		carrierFilter.setCoefficients(IIRCoefficients::makeHighPass(getSampleRate(), cutoff, q));
 		break;
 	case 2:
-		filter.setCoefficients(IIRCoefficients::makeBandPass(getSampleRate(), cutoff, q));
+		carrierFilter.setCoefficients(IIRCoefficients::makeBandPass(getSampleRate(), cutoff, q));
 		break;
 	case 3:
-		filter.setCoefficients(IIRCoefficients::makeNotchFilter(getSampleRate(), cutoff, q));
+		carrierFilter.setCoefficients(IIRCoefficients::makeNotchFilter(getSampleRate(), cutoff, q));
 		break;
 	case 4:
-		filter.setCoefficients(IIRCoefficients::makeAllPass(getSampleRate(), cutoff, q));
+		carrierFilter.setCoefficients(IIRCoefficients::makeAllPass(getSampleRate(), cutoff, q));
 		break;
 	default:
-		filter.setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), cutoff, q));
+		carrierFilter.setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), cutoff, q));
 	}
 }
 
@@ -187,6 +187,34 @@ void WavetableVoice::setFmOscParams(float* newFrequency, float* newDepth)
 	else
 		fmDepth = 0.0f;
 	
+}
+
+void WavetableVoice::setFmFilterParams(float* newType, float* newCutoff, float* newQ)
+{
+	int type = (int)* newType;
+	double cutoff = (double)* newCutoff;
+	double q = (double)* newQ;
+
+	switch (type)
+	{
+	case 0:
+		fmFilter.setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), cutoff, q));
+		break;
+	case 1:
+		fmFilter.setCoefficients(IIRCoefficients::makeHighPass(getSampleRate(), cutoff, q));
+		break;
+	case 2:
+		fmFilter.setCoefficients(IIRCoefficients::makeBandPass(getSampleRate(), cutoff, q));
+		break;
+	case 3:
+		fmFilter.setCoefficients(IIRCoefficients::makeNotchFilter(getSampleRate(), cutoff, q));
+		break;
+	case 4:
+		fmFilter.setCoefficients(IIRCoefficients::makeAllPass(getSampleRate(), cutoff, q));
+		break;
+	default:
+		fmFilter.setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), cutoff, q));
+	}
 }
 
 forcedinline float WavetableVoice::getNextSample() noexcept
@@ -218,7 +246,7 @@ forcedinline float WavetableVoice::getNextSample() noexcept
 	auto currentSample = currentSampleLo * (1.0f - carrierWavetableMix) + currentSampleHi * carrierWavetableMix;
 
 	// Apply filter
-	currentSample = filter.processSingleSampleRaw(currentSample);
+	currentSample = carrierFilter.processSingleSampleRaw(currentSample);
 
 	return currentSample;
 }
@@ -250,6 +278,7 @@ forcedinline void WavetableVoice::modulateFrequency() noexcept
 
 	// Mix samples from both wavetables
 	auto currentSample = currentSampleLo * (1.0f - fmWavetableMix) + currentSampleHi * fmWavetableMix;
+	currentSample = fmFilter.processSingleSampleRaw(currentSample);
 
 	// Calculate new frequency
 	float newFrequency = std::abs(frequency + currentSample * fmDepth);
