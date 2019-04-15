@@ -11,27 +11,27 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "WavetableSound.h"
+#include "Wavetable.h"
 
-class ReferenceCountedSound : public ReferenceCountedObject
+class ReferenceCountedWavetable : public ReferenceCountedObject
 {
 public:
-	typedef ReferenceCountedObjectPtr<ReferenceCountedSound> Ptr;
+	typedef ReferenceCountedObjectPtr<ReferenceCountedWavetable> Ptr;
 
 	//==============================================================================
-	ReferenceCountedSound(const String& path,
-						  WavetableSound::Waveform type,
+	ReferenceCountedWavetable(const String& path,
+						  Wavetable::Waveform type,
 						  const std::vector<float> wavetable = std::vector<float>());
-	~ReferenceCountedSound();
+	~ReferenceCountedWavetable();
 
 	//==============================================================================
-	WavetableSound* getSound();
+	Wavetable* getWavetable();
 	String getPath();
 
 private:
 	String path;
-	WavetableSound sound;
-	WavetableSound::Waveform type;
+	Wavetable wavetable;
+	Wavetable::Waveform type;
 
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ReferenceCountedSound)
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ReferenceCountedWavetable)
 };

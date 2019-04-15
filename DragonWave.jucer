@@ -15,14 +15,16 @@
       <FILE id="ZJcxZa" name="LoadingThread.cpp" compile="1" resource="0"
             file="Source/LoadingThread.cpp"/>
       <FILE id="Mf4l8m" name="LoadingThread.h" compile="0" resource="0" file="Source/LoadingThread.h"/>
-      <FILE id="Wmy0gk" name="ReferenceCountedSound.cpp" compile="1" resource="0"
-            file="Source/ReferenceCountedSound.cpp"/>
-      <FILE id="eNpEna" name="ReferenceCountedSound.h" compile="0" resource="0"
-            file="Source/ReferenceCountedSound.h"/>
+      <FILE id="Wmy0gk" name="ReferenceCountedWavetable.cpp" compile="1"
+            resource="0" file="Source/ReferenceCountedWavetable.cpp"/>
+      <FILE id="eNpEna" name="ReferenceCountedWavetable.h" compile="0" resource="0"
+            file="Source/ReferenceCountedWavetable.h"/>
       <FILE id="a84aSq" name="Functional.h" compile="0" resource="0" file="Source/Functional.h"/>
       <FILE id="ODrDN6" name="Logspace.h" compile="0" resource="0" file="Source/Logspace.h"/>
       <FILE id="tDVqDR" name="Util.cpp" compile="1" resource="0" file="Source/Util.cpp"/>
       <FILE id="gD8Vqz" name="Util.h" compile="0" resource="0" file="Source/Util.h"/>
+      <FILE id="zBU6Sn" name="Wavetable.cpp" compile="1" resource="0" file="Source/Wavetable.cpp"/>
+      <FILE id="Bzd9Ky" name="Wavetable.h" compile="0" resource="0" file="Source/Wavetable.h"/>
       <FILE id="x2BOgu" name="WavetableSound.cpp" compile="1" resource="0"
             file="Source/WavetableSound.cpp"/>
       <FILE id="f0MzII" name="WavetableSound.h" compile="0" resource="0"

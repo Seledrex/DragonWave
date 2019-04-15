@@ -30,30 +30,44 @@ public:
 	void setPitchShift(float* shift);
 	void setFilterParams(float* newType, float* newCutoff, float* newQ);
 	void setOscEnvParams(float* newAttack, float* newDecay, float* newSustain, float* newRelease, float* newLevel);
+	void setFmOscParams(float* newFrequency, float* newDepth);
 
 private:
-	Random random;
-	WavetableSound* wavetableSound = nullptr;
-	std::pair<float, float> boundingFrequencies;
-	std::pair<int, int> boundingIndexes;
 
 	//==============================================================================
 	int wavetableSize = 0;
-	float currentIndex = 0.0f;
-	float tableDelta = 0.0f;
-	float level = 0.0f;
-	float wavetableMix = 0.0f;
-	float oscEnvLevel = 0.0f;
-
-	//==============================================================================
 	int pitchShift = 0;
+	float frequency = 0.0f;
+	float level = 0.0f;
+	float oscEnvLevel = 0.0f;
+	float fmFrequency = 0.0f;
+	float fmDepth = 0.0f;
+
+	float currentCarrierIndex = 0.0f;
+	float carrierTableDelta = 0.0f;
+	float carrierWavetableMix = 0.0f;
+
+	float currentFmIndex = 0.0f;
+	float fmTableDelta = 0.0f;
+	float fmWavetableMix = 0.0f;
 
 	//==============================================================================
+	WavetableSound* ws = nullptr;
+	Wavetable* carrier = nullptr;
+	Wavetable* fm = nullptr;
+
+	//==============================================================================
+	std::pair<int, int> carrierBIs;
+	std::pair<int, int> fmBIs;
+
+	//==============================================================================
+	Random random;
 	IIRFilter filter;
 	ADSR oscEnvelope;
 
 	//==============================================================================
 	forcedinline float getNextSample() noexcept;
+	forcedinline void modulateFrequency() noexcept;
 
 	//==============================================================================
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WavetableVoice);

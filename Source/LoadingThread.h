@@ -22,15 +22,23 @@ public:
 	//==============================================================================
 	void run() override;
 
+private:
+
+	enum OscType {
+		Carrier,
+		FM
+	};
+
+	DragonWaveAudioProcessor& processor;
+	AudioFormatManager formatManager;
+	Wavetable::Waveform previousCarrierWaveform = Wavetable::Waveform::Arbitrary;
+	Wavetable::Waveform previousFMWaveform = Wavetable::Waveform::Arbitrary;
+
 	//==============================================================================
 	void checkForSoundsToFree();
 	void checkForWaveformToSet();
 	void checkForPathToOpen();
-
-private:
-	DragonWaveAudioProcessor& processor;
-	AudioFormatManager formatManager;
-	WavetableSound::Waveform previousWaveform = WavetableSound::Waveform::Arbitrary;;
+	void loadFromDisk(OscType type, String pathToOpen);
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LoadingThread)
 };

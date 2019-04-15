@@ -48,21 +48,21 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 	std::vector<std::unique_ptr<RangedAudioParameter>> params;
 
 	//==============================================================================
-	// Oscillator Params
+	// Carrier Oscillator Params
 	//==============================================================================
-	auto oscillatorPitch = std::make_unique<AudioParameterInt>(
+	auto carrierOscPitch = std::make_unique<AudioParameterInt>(
 		Constants::CARRIER_OSC_PITCH_ID,
 		Constants::CARRIER_OSC_PITCH_NAME,
 		-24, 24, 0
 	);
-	params.push_back(std::move(oscillatorPitch));
+	params.push_back(std::move(carrierOscPitch));
 
-	auto oscillatorVoices = std::make_unique<AudioParameterInt>(
+	auto carrierOscVoices = std::make_unique<AudioParameterInt>(
 		Constants::CARRIER_OSC_VOICES_ID,
 		Constants::CARRIER_OSC_VOICES_NAME,
 		1, 32, 8
 	);
-	params.push_back(std::move(oscillatorVoices));
+	params.push_back(std::move(carrierOscVoices));
 
 	//==============================================================================
 	// Carrier Filter Params
@@ -139,6 +139,25 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		1.0f
 	);
 	params.push_back(std::move(carrierEnvelopeLevel));
+
+	//==============================================================================
+	// FM Oscillator Params
+	//==============================================================================
+	auto fmOscFrequency = std::make_unique<AudioParameterFloat>(
+		Constants::FM_OSC_FREQUENCY_ID,
+		Constants::FM_OSC_FREQUENCY_NAME,
+		NormalisableRange<float>(0.1f, 5000.0f, 0.001f, 0.5f),
+		0.1f
+	);
+	params.push_back(std::move(fmOscFrequency));
+
+	auto fmOscDepth = std::make_unique<AudioParameterFloat>(
+		Constants::FM_OSC_DEPTH_ID,
+		Constants::FM_OSC_DEPTH_NAME,
+		NormalisableRange<float>(0.0f, 5000.0f, 0.001f, 0.5f),
+		0.0f
+	);
+	params.push_back(std::move(fmOscDepth));
 
 	return { params.begin(), params.end() };
 }
@@ -296,6 +315,11 @@ void DragonWaveAudioProcessor::processBlock(AudioBuffer<float> & buffer, MidiBuf
 				parameters.getRawParameterValue(Constants::CARRIER_ENV_RELEASE_ID),
 				parameters.getRawParameterValue(Constants::CARRIER_ENV_LEVEL_ID)
 			);
+
+			voice->setFmOscParams(
+				parameters.getRawParameterValue(Constants::FM_OSC_FREQUENCY_ID),
+				parameters.getRawParameterValue(Constants::FM_OSC_DEPTH_ID)
+			);
 		}
 	}
 
@@ -322,15 +346,23 @@ void DragonWaveAudioProcessor::getStateInformation(MemoryBlock& destData)
 	auto state = parameters.copyState();
 	std::unique_ptr<XmlElement> xml(state.createXml());
 
-	// Include waveform choice
-	int enumVal = chosenWaveform;
+	// Include waveform choices
+	int enumVal = chosenCarrierWaveform;
 	xml->setAttribute(Constants::CARRIER_WAVEFORM_TYPE_ID, enumVal);
+	enumVal = chosenFMWaveform;
+	xml->setAttribute(Constants::FM_WAVEFORM_TYPE_ID, enumVal);
 
-	// Include wavetable file path
-	if (currentSound != nullptr)
-		xml->setAttribute(Constants::CARRIER_WAVETABLE_PATH_ID, currentSound->getPath());
+	// Include carrier wavetable file path
+	if (currentCarrierWavetable != nullptr)
+		xml->setAttribute(Constants::CARRIER_WAVETABLE_PATH_ID, currentCarrierWavetable->getPath());
 	else
 		xml->setAttribute(Constants::CARRIER_WAVETABLE_PATH_ID, "");
+
+	// Include FM wavetable file path
+	if (currentFMWavetable != nullptr)
+		xml->setAttribute(Constants::FM_WAVEFORM_PATH_ID, currentFMWavetable->getPath());
+	else
+		xml->setAttribute(Constants::FM_WAVEFORM_PATH_ID, "");
 
 	// Store parameters in the memory block
 	copyXmlToBinary(*xml, destData);
@@ -350,10 +382,15 @@ void DragonWaveAudioProcessor::setStateInformation(const void* data, int sizeInB
 			// Replace parameter state with that of the XML
 			parameters.replaceState(ValueTree::fromXml(*xmlState));
 
-			// Get the chosen waveform and file path for the wavetable
+			// Get the chosen carrier waveform and file path for the wavetable
 			int chosenWavefromIndex = std::stoi(xmlState->getStringAttribute(Constants::CARRIER_WAVEFORM_TYPE_ID).toStdString());
-			chosenWaveform = static_cast<WavetableSound::Waveform>(chosenWavefromIndex);
-			chosenPath = xmlState->getStringAttribute(Constants::CARRIER_WAVETABLE_PATH_ID);
+			chosenCarrierWaveform = static_cast<Wavetable::Waveform>(chosenWavefromIndex);
+			chosenCarrierPath = xmlState->getStringAttribute(Constants::CARRIER_WAVETABLE_PATH_ID);
+
+			// Get the chosen FM waveform and file path for the wavetable
+			chosenWavefromIndex = std::stoi(xmlState->getStringAttribute(Constants::FM_WAVEFORM_TYPE_ID).toStdString());
+			chosenFMWaveform = static_cast<Wavetable::Waveform>(chosenWavefromIndex);
+			chosenFMPath = xmlState->getStringAttribute(Constants::FM_WAVEFORM_PATH_ID);
 
 			// Notify the thread to load
 			loadingThread->notify();

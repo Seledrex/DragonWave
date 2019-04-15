@@ -53,8 +53,6 @@ FMOscillator::FMOscillator(DragonWaveAudioProcessor& p) :
 	addAndMakeVisible(fmFrequencySlider);
 	fmFrequencySlider.setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
 	fmFrequencySlider.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
-	fmFrequencySlider.setRange(0.1f, 11025.0f, 0.001f);
-	fmFrequencySlider.setSkewFactor(0.5f);
 
 	addAndMakeVisible(fmFrequencyLabel);
 	fmFrequencyLabel.setText(Constants::FM_OSC_FREQUENCY_NAME, dontSendNotification);
@@ -64,8 +62,6 @@ FMOscillator::FMOscillator(DragonWaveAudioProcessor& p) :
 	addAndMakeVisible(fmDepthSlider);
 	fmDepthSlider.setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
 	fmDepthSlider.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
-	fmDepthSlider.setRange(0.0f, 11025.0f, 0.001f);
-	fmDepthSlider.setSkewFactor(0.5f);
 
 	addAndMakeVisible(fmDepthLabel);
 	fmDepthLabel.setText(Constants::FM_OSC_DEPTH_NAME, dontSendNotification);
@@ -148,22 +144,22 @@ void FMOscillator::resized()
 //==============================================================================
 void FMOscillator::buttonClicked(Button* button)
 {
-	WavetableSound::Waveform type;
+	Wavetable::Waveform type;
 
 	// Set waveform type
 	if (button == &sineButton)
-		type = WavetableSound::Waveform::Sine;
+		type = Wavetable::Waveform::Sine;
 	else if (button == &triangleButton)
-		type = WavetableSound::Waveform::Triangle;
+		type = Wavetable::Waveform::Triangle;
 	else if (button == &sawtoothButton)
-		type = WavetableSound::Waveform::Sawtooth;
+		type = Wavetable::Waveform::Sawtooth;
 	else if (button == &squareButton)
-		type = WavetableSound::Waveform::Square;
+		type = Wavetable::Waveform::Square;
 	else
-		type = WavetableSound::Waveform::Noise;
+		type = Wavetable::Waveform::Noise;
 
 	// Update chosen waveform and notify loading thread
-	processor.chosenWaveform = type;
+	processor.chosenFMWaveform = type;
 	processor.loadingThread->notify();
 }
 
@@ -181,7 +177,7 @@ void FMOscillator::openButtonClicked()
 		// Update chosen path and notify loading thread
 		auto file = chooser.getResult();
 		auto path = file.getFullPathName();
-		processor.chosenPath.swapWith(path);
+		processor.chosenFMPath.swapWith(path);
 		processor.loadingThread->notify();
 	}
 }

@@ -27,34 +27,55 @@ void WavetableVoice::startNote(
 	int /*currentPitchWheelPosition*/)
 {
 	// Convert MIDI to frequency
-	float frequency = (float)MidiMessage::getMidiNoteInHertz(midiNoteNumber + pitchShift);
+	frequency = (float)MidiMessage::getMidiNoteInHertz(midiNoteNumber + pitchShift);
 
 	// Get the wavetable information
-	wavetableSound = dynamic_cast<WavetableSound*>(sound);
-	boundingFrequencies = wavetableSound->getBoundingFrequencies(frequency);
-	boundingIndexes = wavetableSound->getBoundingIndexes(boundingFrequencies);
-	wavetableSize = wavetableSound->getWavetableSize();
+	ws = dynamic_cast<WavetableSound*>(sound);
+	carrier = ws->carrier->getWavetable();
+	fm = ws->fm->getWavetable();
 
-	// Set voice data
+	// Set wavetable size
+	wavetableSize = carrier->getWavetableSize();
+
+	// Get bounding frequencies and indices
+	auto carrierBFs = carrier->getBoundingFrequencies(frequency);
+	auto fmBFs = fm->getBoundingFrequencies(fmFrequency);
+	carrierBIs = carrier->getBoundingIndexes(carrierBFs);
+	fmBIs = fm->getBoundingIndexes(fmBFs);
+
+	// Set level based off velocity
 	level = velocity * 0.15f;
-	currentIndex = 0.0;
-	tableDelta = frequency * wavetableSize / (float)getSampleRate();
 
-	// Calculate mixing proportions
-	if (boundingFrequencies.first != boundingFrequencies.second)
-		wavetableMix = (frequency - boundingFrequencies.first) / (boundingFrequencies.second - boundingFrequencies.first);
+	// Set carrier oscillator wavetable index and delta
+	currentCarrierIndex = 0.0f;
+	carrierTableDelta = frequency * wavetableSize / (float)getSampleRate();
+
+	// Set FM oscillator wavetable index and delta
+	currentFmIndex = 0.0f;
+	fmTableDelta = frequency * wavetableSize / (float)getSampleRate();
+
+	// Calculate carrier oscillator mixing proportions
+	if (carrierBFs.first != carrierBFs.second)
+		carrierWavetableMix = (frequency - carrierBFs.first) / (carrierBFs.second - carrierBFs.first);
 	else
-		wavetableMix = 1;
+		carrierWavetableMix = 1;
 
+	// Calculate FM oscillator mixing proportions
+	if (fmBFs.first != fmBFs.second)
+		fmWavetableMix = (frequency - fmBFs.first) / (fmBFs.second - fmBFs.first);
+	else
+		fmWavetableMix = 1;
+
+	// Start attack phase
 	oscEnvelope.noteOn();
 }
 
 void WavetableVoice::renderNextBlock(AudioSampleBuffer & outputBuffer, int startSample, int numSamples)
 {
 	// Make sure we have a note to play
-	if (tableDelta != 0)
+	if (carrierTableDelta != 0)
 	{
-		if (wavetableSound->getWaveformType() == WavetableSound::Waveform::Noise)
+		if (carrier->getWaveformType() == Wavetable::Waveform::Noise)
 		{
 			while (--numSamples >= 0)
 			{
@@ -71,11 +92,15 @@ void WavetableVoice::renderNextBlock(AudioSampleBuffer & outputBuffer, int start
 		{
 			while (--numSamples >= 0)
 			{
-				// Calculate current sample
-				auto currentEnv = oscEnvelope.getNextSample();
-				auto currentSample = getNextSample() * currentEnv * oscEnvLevel * level;
-				
+				// Modulate carrier frequency
+				modulateFrequency();
 
+				// Get next envelope value
+				auto currentEnv = oscEnvelope.getNextSample() * oscEnvLevel;
+
+				// Calculate current sample
+				auto currentSample = getNextSample() * currentEnv * level;
+				
 				// Place sample into output buffer
 				for (auto i = 0; i < outputBuffer.getNumChannels(); i++)
 					outputBuffer.addSample(i, startSample, currentSample);
@@ -95,7 +120,7 @@ void WavetableVoice::stopNote(float /*velocity*/, bool allowTailOff)
 	else
 	{
 		clearCurrentNote();
-		tableDelta = 0;
+		carrierTableDelta = 0;
 	}
 }
 
@@ -147,36 +172,99 @@ void WavetableVoice::setOscEnvParams(float* newAttack, float* newDecay, float* n
 	oscEnvLevel = *newLevel;
 }
 
+void WavetableVoice::setFmOscParams(float* newFrequency, float* newDepth)
+{
+	fmFrequency = *newFrequency;
+	fmDepth = *newDepth;
+}
+
 forcedinline float WavetableVoice::getNextSample() noexcept
 {
 	// Get the indexes that surround the current index estimate
-	auto indexBefore = (unsigned int)currentIndex;
+	auto indexBefore = (unsigned int)currentCarrierIndex;
 	auto indexAfter = indexBefore + 1;
 
 	// Find the fraction of how far current sample is towards the next
-	auto frac = currentIndex - (float)indexBefore;
+	auto frac = currentCarrierIndex - (float)indexBefore;
 
 	// Get next sample on lower wavetable
-	auto* tableLo = wavetableSound->getWavetables().getReadPointer(boundingIndexes.first);
+	auto* tableLo = carrier->getWavetables().getReadPointer(carrierBIs.first);
 	auto valueBeforeLo = tableLo[indexBefore];
 	auto valueAfterLo = tableLo[indexAfter];
 	float currentSampleLo = valueBeforeLo + frac * (valueAfterLo - valueBeforeLo);
 
 	// Get next sample on higher wavetable
-	auto * tableHi = wavetableSound->getWavetables().getReadPointer(boundingIndexes.second);
+	auto * tableHi = carrier->getWavetables().getReadPointer(carrierBIs.second);
 	auto valueBeforeHi = tableHi[indexBefore];
 	auto valueAfterHi = tableHi[indexAfter];
 	float currentSampleHi = valueBeforeHi + frac * (valueAfterHi - valueBeforeHi);
 
 	// Increment phase change and prevent overflow
-	currentIndex += tableDelta;
-	currentIndex = std::fmod(currentIndex, (float)wavetableSize);
+	currentCarrierIndex += carrierTableDelta;
+	currentCarrierIndex = std::fmod(currentCarrierIndex, (float)wavetableSize);
 
 	// Mix samples from both wavetables
-	auto currentSample = currentSampleLo * (1.0f - wavetableMix) + currentSampleHi * wavetableMix;
+	auto currentSample = currentSampleLo * (1.0f - carrierWavetableMix) + currentSampleHi * carrierWavetableMix;
 
 	// Apply filter
 	currentSample = filter.processSingleSampleRaw(currentSample);
 
 	return currentSample;
+}
+
+forcedinline void WavetableVoice::modulateFrequency() noexcept
+{
+	// Get the indexes that surround the current index estimate
+	auto indexBefore = (unsigned int)currentFmIndex;
+	auto indexAfter = indexBefore + 1;
+
+	// Find the fraction of how far current sample is towards the next
+	auto frac = currentFmIndex - (float)indexBefore;
+
+	// Get next sample on lower wavetable
+	auto* tableLo = fm->getWavetables().getReadPointer(fmBIs.first);
+	auto valueBeforeLo = tableLo[indexBefore];
+	auto valueAfterLo = tableLo[indexAfter];
+	float currentSampleLo = valueBeforeLo + frac * (valueAfterLo - valueBeforeLo);
+
+	// Get next sample on higher wavetable
+	auto * tableHi = fm->getWavetables().getReadPointer(fmBIs.second);
+	auto valueBeforeHi = tableHi[indexBefore];
+	auto valueAfterHi = tableHi[indexAfter];
+	float currentSampleHi = valueBeforeHi + frac * (valueAfterHi - valueBeforeHi);
+
+	// Increment phase change and prevent overflow
+	currentFmIndex += fmTableDelta;
+	currentFmIndex = std::fmod(currentFmIndex, (float)wavetableSize);
+
+	// Mix samples from both wavetables
+	auto currentSample = currentSampleLo * (1.0f - fmWavetableMix) + currentSampleHi * fmWavetableMix;
+
+	// Calculate new frequency
+	float newFrequency = std::abs(frequency + currentSample * fmDepth);
+	carrierTableDelta = newFrequency * wavetableSize / (float)getSampleRate();
+
+	// Get bounding frequencies and indices
+	auto carrierBFs = carrier->getBoundingFrequencies(newFrequency);
+	carrierBIs = carrier->getBoundingIndexes(carrierBFs);
+
+	// Calculate carrier oscillator mixing proportions
+	if (carrierBFs.first != carrierBFs.second)
+		carrierWavetableMix = (newFrequency - carrierBFs.first) / (carrierBFs.second - carrierBFs.first);
+	else
+		carrierWavetableMix = 1;
+
+	/*
+	fmTableDelta = fmFrequency * wavetableSize / (float)getSampleRate();
+
+	// Get bounding frequencies and indices
+	auto fmBFs = fm->getBoundingFrequencies(fmFrequency);
+	fmBIs = fm->getBoundingIndexes(fmBFs);
+
+	// Calculate carrier oscillator mixing proportions
+	if (fmBFs.first != fmBFs.second)
+		fmWavetableMix = (fmFrequency - fmBFs.first) / (fmBFs.second - fmBFs.first);
+	else
+		fmWavetableMix = 1;
+		*/
 }

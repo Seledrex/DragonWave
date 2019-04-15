@@ -28,14 +28,14 @@ public:
 
 	//=============================================================================
 	void incrementFrameCount();
-	void setSound(ReferenceCountedSound::Ptr sound);
+	void setSound(ReferenceCountedWavetable::Ptr sound);
 
 private:
 	DragonWaveAudioProcessor& processor;
 
 	//==============================================================================
 	String title;
-	ReferenceCountedSound::Ptr retainedCurrentSound;
+	ReferenceCountedWavetable::Ptr retainedCurrentWavetable;
 
 	//==============================================================================
 	int frameCount = 0;

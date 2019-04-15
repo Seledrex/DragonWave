@@ -12,7 +12,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "WavetableSound.h"
-#include "ReferenceCountedSound.h"
+#include "ReferenceCountedWavetable.h"
 #include "Constants.h"
 
 //==============================================================================
@@ -74,12 +74,16 @@ public:
 
 	//==============================================================================
 	std::unique_ptr<LoadingThread> loadingThread;
-	ReferenceCountedArray<ReferenceCountedSound> sounds;
-	ReferenceCountedSound::Ptr currentSound;
+	ReferenceCountedArray<ReferenceCountedWavetable> carrierWavetables;
+	ReferenceCountedArray<ReferenceCountedWavetable> fmWavetables;
+	ReferenceCountedWavetable::Ptr currentCarrierWavetable;
+	ReferenceCountedWavetable::Ptr currentFMWavetable;
 
 	//==============================================================================
-	String chosenPath = "";
-	WavetableSound::Waveform chosenWaveform = WavetableSound::Waveform::Sawtooth;
+	String chosenCarrierPath = "";
+	String chosenFMPath = "";
+	Wavetable::Waveform chosenCarrierWaveform = Wavetable::Waveform::Sawtooth;
+	Wavetable::Waveform chosenFMWaveform = Wavetable::Waveform::Sine;
 
 private:
 

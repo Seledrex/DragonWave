@@ -48,17 +48,16 @@ void Oscilloscope::paint (Graphics& g)
 	int retainedNoteOnCount = processor.noteOnCount;
 
 	// Do not draw waveform if there is none to draw
-	if (retainedCurrentSound == nullptr) {
+	if (retainedCurrentWavetable == nullptr) {
 		return;
 	}
 
 	// Get sound and ensure it's initialized
-	auto* sound = retainedCurrentSound->getSound();
-	jassert(sound->isInitialized());
+	auto* sound = retainedCurrentWavetable->getWavetable();
 
 	// Downsample wavetable
 	std::vector<float> downsampledWavetable;
-	for (int i = 0; i < WavetableSound::wavetableSize; i += downsamplingFactor)
+	for (int i = 0; i < Wavetable::wavetableSize; i += downsamplingFactor)
 		downsampledWavetable.push_back(sound->getWavetables().getSample(0, i));
 
 	// Set size to be the downsampled size
@@ -140,7 +139,7 @@ void Oscilloscope::incrementFrameCount()
 	frameCount++;
 }
 
-void Oscilloscope::setSound(ReferenceCountedSound::Ptr sound)
+void Oscilloscope::setSound(ReferenceCountedWavetable::Ptr wavetable)
 {
-	retainedCurrentSound = sound;
+	retainedCurrentWavetable = wavetable;
 }
