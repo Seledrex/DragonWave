@@ -44,10 +44,6 @@ void Oscilloscope::paint (Graphics& g)
 	float animationWidth = areaWidth - Constants::PADDING * 2;
 	float animationHeight = areaHeight - Constants::PADDING * 2;
 
-	// Create value ranges for the animation
-	NormalisableRange<float> yRange(-1.0f * animationHeight / 2.0f, animationHeight / 2.0f);
-	NormalisableRange<float> xRange(0.0f, (float)wavetableSize);
-
 	// Keep a copy of the current sound
 	int retainedNoteOnCount = processor.noteOnCount;
 
@@ -55,9 +51,22 @@ void Oscilloscope::paint (Graphics& g)
 	if (retainedCurrentSound == nullptr) {
 		return;
 	}
-		
+
+	// Get sound and ensure it's initialized
 	auto* sound = retainedCurrentSound->getSound();
 	jassert(sound->isInitialized());
+
+	// Downsample wavetable
+	std::vector<float> downsampledWavetable;
+	for (int i = 0; i < WavetableSound::wavetableSize; i += downsamplingFactor)
+		downsampledWavetable.push_back(sound->getWavetables().getSample(0, i));
+
+	// Set size to be the downsampled size
+	int wavetableSize = (int)downsampledWavetable.size();
+
+	// Create value ranges for the animation
+	NormalisableRange<float> yRange(-1.0f * animationHeight / 2.0f, animationHeight / 2.0f);
+	NormalisableRange<float> xRange(0.0f, (float)wavetableSize);
 
 	// Create static waveform path
 	Path staticPath;
@@ -67,7 +76,7 @@ void Oscilloscope::paint (Graphics& g)
 
 	for (int i = 0; i < wavetableSize; i++)
 	{
-		float sample = sound->getWavetables().getSample(0, i);
+		float sample = downsampledWavetable[i];
 		float y = yOffset + -1.0f * yRange.convertFrom0to1((sample + 1.0f) / 2.0f);
 		Point<float> p(x, y);
 
@@ -101,7 +110,7 @@ void Oscilloscope::paint (Graphics& g)
 		for (int i = 0; i < animatedIndices.size(); i++)
 		{
 			int index = animatedIndices[i];
-			float sample = sound->getWavetables().getSample(0, index);
+			float sample = downsampledWavetable[index];
 			float y = yOffset + -1.0f * yRange.convertFrom0to1((sample + 1.0f) / 2.0f);
 			x = getWidth() / 2.0f - animationWidth / 2.0f + dx * index;
 			Point<float> p(x, y);
@@ -126,9 +135,9 @@ void Oscilloscope::resized()
 {
 }
 
-void Oscilloscope::setFrameCount(int count)
+void Oscilloscope::incrementFrameCount()
 {
-	frameCount = count;
+	frameCount++;
 }
 
 void Oscilloscope::setSound(ReferenceCountedSound::Ptr sound)

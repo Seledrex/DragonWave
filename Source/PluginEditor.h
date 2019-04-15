@@ -41,7 +41,6 @@ private:
 	Envelope carrierEnvGUI;
 
 	//==============================================================================
-	int frameCounter = 0;
 	void timerCallback() override;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DragonWaveAudioProcessorEditor)

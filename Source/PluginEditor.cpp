@@ -63,9 +63,8 @@ void DragonWaveAudioProcessorEditor::resized()
 //==============================================================================
 void DragonWaveAudioProcessorEditor::timerCallback()
 {
-	frameCounter++;
 	carrierOscilloscopeGUI.setSound(ReferenceCountedSound::Ptr(processor.currentSound));
-	carrierOscilloscopeGUI.setFrameCount(frameCounter);
+	carrierOscilloscopeGUI.incrementFrameCount();
 	carrierOscilloscopeGUI.repaint();
 }
 

@@ -27,7 +27,7 @@ public:
     void resized() override;
 
 	//=============================================================================
-	void setFrameCount(int count);
+	void incrementFrameCount();
 	void setSound(ReferenceCountedSound::Ptr sound);
 
 private:
@@ -39,7 +39,7 @@ private:
 
 	//==============================================================================
 	int frameCount = 0;
-	int wavetableSize = WavetableSound::wavetableSize;
+	int downsamplingFactor = 2;
 
 	//==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Oscilloscope)
