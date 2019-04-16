@@ -17,6 +17,7 @@
 #include "FMOscillator.h"
 #include "Filter.h"
 #include "Envelope.h"
+#include "Menu.h"
 
 //==============================================================================
 /**
@@ -47,6 +48,8 @@ private:
 
 	Envelope carrierEnvGUI;
 	Envelope fmEnvGUI;
+
+	Menu menuGUI;
 
 	//==============================================================================
 	void timerCallback() override;
