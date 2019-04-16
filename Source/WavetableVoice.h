@@ -27,13 +27,14 @@ public:
 	void controllerMoved(int controllerNumber, int newControllerValue) override;
 
 	//==============================================================================
-	void setOscPitchShift(float* shift);
-	void setOscFilterParams(float* newType, float* newCutoff, float* newQ);
-	void setOscEnvParams(float* newAttack, float* newDecay, float* newSustain, float* newRelease, float* newLevel);
+	void setCarrierPitchShift(float* shift);
+	void setCarrierFilterParams(float* newType, float* newCutoff, float* newQ);
+	void setCarrierEnvParams(float* newAttack, float* newDecay, float* newSustain, float* newRelease, float* newLevel);
 	
 	//==============================================================================
 	void setFmOscParams(float* newFrequency, float* newDepth);
 	void setFmFilterParams(float* newType, float* newCutoff, float* newQ);
+	void setFmEnvParams(float* newAttack, float* newDecay, float* newSustain, float* newRelease, float* newLevel);
 
 private:
 
@@ -42,7 +43,8 @@ private:
 	int pitchShift = 0;
 	float frequency = 0.0f;
 	float level = 0.0f;
-	float oscEnvLevel = 0.0f;
+	float carrierEnvLevel = 0.0f;
+	float fmEnvLevel = 0.0f;
 	float fmFrequency = 0.0f;
 	float fmDepth = 0.0f;
 
@@ -67,7 +69,8 @@ private:
 	Random random;
 	IIRFilter carrierFilter;
 	IIRFilter fmFilter;
-	ADSR oscEnvelope;
+	ADSR carrierEnvelope;
+	ADSR fmEnvelope;
 
 	//==============================================================================
 	forcedinline float getNextSample() noexcept;

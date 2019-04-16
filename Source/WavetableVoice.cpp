@@ -67,7 +67,8 @@ void WavetableVoice::startNote(
 		fmWavetableMix = 1;
 
 	// Start attack phase
-	oscEnvelope.noteOn();
+	carrierEnvelope.noteOn();
+	fmEnvelope.noteOn();
 }
 
 void WavetableVoice::renderNextBlock(AudioSampleBuffer & outputBuffer, int startSample, int numSamples)
@@ -79,8 +80,8 @@ void WavetableVoice::renderNextBlock(AudioSampleBuffer & outputBuffer, int start
 		{
 			while (--numSamples >= 0)
 			{
-				auto currentEnv = oscEnvelope.getNextSample();
-				auto currentSample = (random.nextFloat() * 2 - 1) * currentEnv * oscEnvLevel * level;
+				auto currentEnv = carrierEnvelope.getNextSample();
+				auto currentSample = (random.nextFloat() * 2 - 1) * currentEnv * carrierEnvLevel * level;
 
 				for (auto i = 0; i < outputBuffer.getNumChannels(); i++)
 					outputBuffer.addSample(i, startSample, currentSample);
@@ -96,7 +97,7 @@ void WavetableVoice::renderNextBlock(AudioSampleBuffer & outputBuffer, int start
 				modulateFrequency();
 
 				// Get next envelope value
-				auto currentEnv = oscEnvelope.getNextSample() * oscEnvLevel;
+				auto currentEnv = carrierEnvelope.getNextSample() * carrierEnvLevel;
 
 				// Calculate current sample
 				auto currentSample = getNextSample() * currentEnv * level;
@@ -115,7 +116,8 @@ void WavetableVoice::stopNote(float /*velocity*/, bool allowTailOff)
 {
 	if (allowTailOff)
 	{
-		oscEnvelope.noteOff();
+		carrierEnvelope.noteOff();
+		fmEnvelope.noteOff();
 	}
 	else
 	{
@@ -132,12 +134,12 @@ void WavetableVoice::controllerMoved(int /*controllerNumber*/, int /*newControll
 {
 }
 
-void WavetableVoice::setOscPitchShift(float* shift)
+void WavetableVoice::setCarrierPitchShift(float* shift)
 {
 	pitchShift = (int)*shift;
 }
 
-void WavetableVoice::setOscFilterParams(float* newType, float* newCutoff, float* newQ)
+void WavetableVoice::setCarrierFilterParams(float* newType, float* newCutoff, float* newQ)
 {
 	int type = (int)* newType;
 	double cutoff = (double)* newCutoff;
@@ -165,11 +167,11 @@ void WavetableVoice::setOscFilterParams(float* newType, float* newCutoff, float*
 	}
 }
 
-void WavetableVoice::setOscEnvParams(float* newAttack, float* newDecay, float* newSustain, float* newRelease, float* newLevel)
+void WavetableVoice::setCarrierEnvParams(float* newAttack, float* newDecay, float* newSustain, float* newRelease, float* newLevel)
 {
-	oscEnvelope.setSampleRate(getSampleRate());
-	oscEnvelope.setParameters({ *newAttack, *newDecay, *newSustain, *newRelease });
-	oscEnvLevel = *newLevel;
+	carrierEnvelope.setSampleRate(getSampleRate());
+	carrierEnvelope.setParameters({ *newAttack, *newDecay, *newSustain, *newRelease });
+	carrierEnvLevel = *newLevel;
 }
 
 void WavetableVoice::setFmOscParams(float* newFrequency, float* newDepth)
@@ -215,6 +217,13 @@ void WavetableVoice::setFmFilterParams(float* newType, float* newCutoff, float* 
 	default:
 		fmFilter.setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), cutoff, q));
 	}
+}
+
+void WavetableVoice::setFmEnvParams(float* newAttack, float* newDecay, float* newSustain, float* newRelease, float* newLevel)
+{
+	fmEnvelope.setSampleRate(getSampleRate());
+	fmEnvelope.setParameters({ *newAttack, *newDecay, *newSustain, *newRelease });
+	fmEnvLevel = *newLevel;
 }
 
 forcedinline float WavetableVoice::getNextSample() noexcept
@@ -279,6 +288,10 @@ forcedinline void WavetableVoice::modulateFrequency() noexcept
 	// Mix samples from both wavetables
 	auto currentSample = currentSampleLo * (1.0f - fmWavetableMix) + currentSampleHi * fmWavetableMix;
 	currentSample = fmFilter.processSingleSampleRaw(currentSample);
+
+	// Apply envelope
+	float currentFmEnv = fmEnvelope.getNextSample() * fmEnvLevel;
+	currentSample *= currentFmEnv;
 
 	// Calculate new frequency
 	float newFrequency = std::abs(frequency + currentSample * fmDepth);

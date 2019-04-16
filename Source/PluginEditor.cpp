@@ -38,7 +38,14 @@ DragonWaveAudioProcessorEditor::DragonWaveAudioProcessorEditor(DragonWaveAudioPr
 		Constants::CARRIER_ENV_DECAY_ID,
 		Constants::CARRIER_ENV_SUSTAIN_ID,
 		Constants::CARRIER_ENV_RELEASE_ID,
-		Constants::CARRIER_ENV_LEVEL_ID)
+		Constants::CARRIER_ENV_LEVEL_ID),
+	fmEnvGUI(p,
+		Constants::FM_ENV_TITLE,
+		Constants::FM_ENV_ATTACK_ID,
+		Constants::FM_ENV_DECAY_ID,
+		Constants::FM_ENV_SUSTAIN_ID,
+		Constants::FM_ENV_RELEASE_ID,
+		Constants::FM_ENV_LEVEL_ID)
 {
 	setSize(Constants::EDITOR_WIDTH, Constants::EDITOR_HEIGHT);
 	startTimerHz(60);
@@ -51,6 +58,7 @@ DragonWaveAudioProcessorEditor::DragonWaveAudioProcessorEditor(DragonWaveAudioPr
 	addAndMakeVisible(fmOscilloscopeGUI);
 	addAndMakeVisible(fmOscGUI);
 	addAndMakeVisible(fmFilterGUI);
+	addAndMakeVisible(fmEnvGUI);
 }
 
 DragonWaveAudioProcessorEditor::~DragonWaveAudioProcessorEditor()
@@ -78,6 +86,7 @@ void DragonWaveAudioProcessorEditor::resized()
 	fmOscilloscopeGUI.setBounds(column2.removeFromTop(Constants::COMPONENT_HEIGHT));
 	fmOscGUI.setBounds(column2.removeFromTop(Constants::COMPONENT_HEIGHT));
 	fmFilterGUI.setBounds(column2.removeFromTop(Constants::COMPONENT_HEIGHT));
+	fmEnvGUI.setBounds(column2.removeFromTop(Constants::COMPONENT_HEIGHT));
 }
 
 //==============================================================================

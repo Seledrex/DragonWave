@@ -53,6 +53,16 @@ public:
 	static const String FM_FILTER_CUTOFF_NAME;
 	static const String FM_FILTER_Q_ID;
 	static const String FM_FILTER_Q_NAME;
+	static const String FM_ENV_ATTACK_ID;
+	static const String FM_ENV_ATTACK_NAME;
+	static const String FM_ENV_DECAY_ID;
+	static const String FM_ENV_DECAY_NAME;
+	static const String FM_ENV_SUSTAIN_ID;
+	static const String FM_ENV_SUSTAIN_NAME;
+	static const String FM_ENV_RELEASE_ID;
+	static const String FM_ENV_RELEASE_NAME;
+	static const String FM_ENV_LEVEL_ID;
+	static const String FM_ENV_LEVEL_NAME;
 
 	//==============================================================================
 	static const int EDITOR_WIDTH;
@@ -71,6 +81,7 @@ public:
 	static const String FM_OSCILLOSCOPE_TITLE;
 	static const String FM_OSCILLATOR_TITLE;
 	static const String FM_FILTER_TITLE;
+	static const String FM_ENV_TITLE;
 
 	//==============================================================================
 	static const String SINE;

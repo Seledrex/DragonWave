@@ -46,6 +46,7 @@ private:
 	Filter fmFilterGUI;
 
 	Envelope carrierEnvGUI;
+	Envelope fmEnvGUI;
 
 	//==============================================================================
 	void timerCallback() override;

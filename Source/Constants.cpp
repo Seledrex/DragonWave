@@ -47,6 +47,16 @@ const String Constants::FM_FILTER_CUTOFF_ID = "fmFilterCutoff";
 const String Constants::FM_FILTER_CUTOFF_NAME = "FMF Cutoff";
 const String Constants::FM_FILTER_Q_ID = "fmFilterQ";
 const String Constants::FM_FILTER_Q_NAME = "FMF Q";
+const String Constants::FM_ENV_ATTACK_ID = "fmEnvAttack";
+const String Constants::FM_ENV_ATTACK_NAME = "FME Attack";
+const String Constants::FM_ENV_DECAY_ID = "fmEnvDecay";
+const String Constants::FM_ENV_DECAY_NAME = "FME Decay";
+const String Constants::FM_ENV_SUSTAIN_ID = "fmEnvSustain";
+const String Constants::FM_ENV_SUSTAIN_NAME = "FME Sustain";
+const String Constants::FM_ENV_RELEASE_ID = "fmEnvRelease";
+const String Constants::FM_ENV_RELEASE_NAME = "FME Release";
+const String Constants::FM_ENV_LEVEL_ID = "fmEnvLevel";
+const String Constants::FM_ENV_LEVEL_NAME = "FME Level";
 
 //==============================================================================
 const int Constants::EDITOR_WIDTH = 900;
@@ -65,6 +75,7 @@ const String Constants::CARRIER_ENV_TITLE = "Carrier Envelope";
 const String Constants::FM_OSCILLOSCOPE_TITLE = "FM Oscillator";
 const String Constants::FM_OSCILLATOR_TITLE = "FM Oscillator Settings";
 const String Constants::FM_FILTER_TITLE = "FM Filter";
+const String Constants::FM_ENV_TITLE = "FM Envelope";
 
 //==============================================================================
 const String Constants::SINE = "Sin";
