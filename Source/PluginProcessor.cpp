@@ -235,6 +235,49 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 	);
 	params.push_back(std::move(fmEnvelopeLevel));
 
+	//==============================================================================
+	// Carrier Filter Envelope Params
+	//==============================================================================
+	auto carrierFilterEnvelopeAttack = std::make_unique<AudioParameterFloat>(
+		Constants::CARRIER_FILTER_ENV_ATTACK_ID,
+		Constants::CARRIER_FILTER_ENV_ATTACK_NAME,
+		NormalisableRange<float>(0.001f, 5.0f, 0.001f, 0.5f),
+		0.001f
+	);
+	params.push_back(std::move(carrierFilterEnvelopeAttack));
+
+	auto carrierFilterEnvelopeDecay = std::make_unique<AudioParameterFloat>(
+		Constants::CARRIER_FILTER_ENV_DECAY_ID,
+		Constants::CARRIER_FILTER_ENV_DECAY_NAME,
+		NormalisableRange<float>(0.001f, 5.0f, 0.001f, 0.5f),
+		0.001f
+	);
+	params.push_back(std::move(carrierFilterEnvelopeDecay));
+
+	auto carrierFilterEnvelopeSustain = std::make_unique<AudioParameterFloat>(
+		Constants::CARRIER_FILTER_ENV_SUSTAIN_ID,
+		Constants::CARRIER_FILTER_ENV_SUSTAIN_NAME,
+		NormalisableRange<float>(0.0f, 1.0f, 0.001f, 0.5f),
+		1.0f
+	);
+	params.push_back(std::move(carrierFilterEnvelopeSustain));
+
+	auto carrierFilterEnvelopeRelease = std::make_unique<AudioParameterFloat>(
+		Constants::CARRIER_FILTER_ENV_RELEASE_ID,
+		Constants::CARRIER_FILTER_ENV_RELEASE_NAME,
+		NormalisableRange<float>(0.001f, 5.0f, 0.001f, 0.5f),
+		0.001f
+	);
+	params.push_back(std::move(carrierFilterEnvelopeRelease));
+
+	auto carrierFilterEnvelopeLevel = std::make_unique<AudioParameterFloat>(
+		Constants::CARRIER_FILTER_ENV_LEVEL_ID,
+		Constants::CARRIER_FILTER_ENV_LEVEL_NAME,
+		NormalisableRange<float>(-1.0f, 1.0f, 0.001f),
+		0.0f
+	);
+	params.push_back(std::move(carrierFilterEnvelopeLevel));
+
 	return { params.begin(), params.end() };
 }
 
@@ -379,9 +422,9 @@ void DragonWaveAudioProcessor::processBlock(AudioBuffer<float> & buffer, MidiBuf
 			);
 
 			voice->setCarrierFilterParams(
-				parameters.getRawParameterValue(Constants::CARRIER_FILTER_TYPE_ID),
-				parameters.getRawParameterValue(Constants::CARRIER_FILTER_CUTOFF_ID),
-				parameters.getRawParameterValue(Constants::CARRIER_FILTER_Q_ID)
+				*parameters.getRawParameterValue(Constants::CARRIER_FILTER_TYPE_ID),
+				*parameters.getRawParameterValue(Constants::CARRIER_FILTER_CUTOFF_ID),
+				*parameters.getRawParameterValue(Constants::CARRIER_FILTER_Q_ID)
 			);
 
 			voice->setCarrierEnvParams(
@@ -390,6 +433,14 @@ void DragonWaveAudioProcessor::processBlock(AudioBuffer<float> & buffer, MidiBuf
 				parameters.getRawParameterValue(Constants::CARRIER_ENV_SUSTAIN_ID),
 				parameters.getRawParameterValue(Constants::CARRIER_ENV_RELEASE_ID),
 				parameters.getRawParameterValue(Constants::CARRIER_ENV_LEVEL_ID)
+			);
+
+			voice->setCarrierFilterEnvParams(
+				parameters.getRawParameterValue(Constants::CARRIER_FILTER_ENV_ATTACK_ID),
+				parameters.getRawParameterValue(Constants::CARRIER_FILTER_ENV_DECAY_ID),
+				parameters.getRawParameterValue(Constants::CARRIER_FILTER_ENV_SUSTAIN_ID),
+				parameters.getRawParameterValue(Constants::CARRIER_FILTER_ENV_RELEASE_ID),
+				parameters.getRawParameterValue(Constants::CARRIER_FILTER_ENV_LEVEL_ID)
 			);
 
 			voice->setFmOscParams(

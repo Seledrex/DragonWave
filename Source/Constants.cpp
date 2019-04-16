@@ -33,6 +33,16 @@ const String Constants::CARRIER_ENV_RELEASE_ID = "carrierEnvRelease";
 const String Constants::CARRIER_ENV_RELEASE_NAME = "CE Release";
 const String Constants::CARRIER_ENV_LEVEL_ID = "carrierEnvLevel";
 const String Constants::CARRIER_ENV_LEVEL_NAME = "CE Level";
+const String Constants::CARRIER_FILTER_ENV_ATTACK_ID = "carrierFilterEnvAttack";
+const String Constants::CARRIER_FILTER_ENV_ATTACK_NAME = "CFE Attack";
+const String Constants::CARRIER_FILTER_ENV_DECAY_ID = "carrierFilterEnvDecay";
+const String Constants::CARRIER_FILTER_ENV_DECAY_NAME = "CFE Decay";
+const String Constants::CARRIER_FILTER_ENV_SUSTAIN_ID = "carrierFilterEnvSustain";
+const String Constants::CARRIER_FILTER_ENV_SUSTAIN_NAME = "CFE Sustain";
+const String Constants::CARRIER_FILTER_ENV_RELEASE_ID = "carrierFilterEnvRelease";
+const String Constants::CARRIER_FILTER_ENV_RELEASE_NAME = "CFE Release";
+const String Constants::CARRIER_FILTER_ENV_LEVEL_ID = "carrierFilterEnvLevel";
+const String Constants::CARRIER_FILTER_ENV_LEVEL_NAME = "CFE Level";
 
 //==============================================================================
 const String Constants::FM_WAVEFORM_TYPE_ID = "fmWaveformType";
@@ -70,6 +80,7 @@ const String Constants::CARRIER_OSCILLOSCOPE_TITLE = "Carrier Oscillator";
 const String Constants::CARRIER_OSCILLATOR_TITLE = "Carrier Oscillator Settings";
 const String Constants::CARRIER_FILTER_TITLE = "Carrier Filter";
 const String Constants::CARRIER_ENV_TITLE = "Carrier Envelope";
+const String Constants::CARRIER_FILTER_ENV_TITLE = "Carrier Filter Envelope";
 
 //==============================================================================
 const String Constants::FM_OSCILLOSCOPE_TITLE = "FM Oscillator";

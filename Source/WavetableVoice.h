@@ -28,9 +28,10 @@ public:
 
 	//==============================================================================
 	void setCarrierPitchShift(float* shift);
-	void setCarrierFilterParams(float* newType, float* newCutoff, float* newQ);
+	void setCarrierFilterParams(float newType, float newCutoff, float newQ);
 	void setCarrierEnvParams(float* newAttack, float* newDecay, float* newSustain, float* newRelease, float* newLevel);
-	
+	void setCarrierFilterEnvParams(float* newAttack, float* newDecay, float* newSustain, float* newRelease, float* newLevel);
+
 	//==============================================================================
 	void setFmOscParams(float* newFrequency, float* newDepth);
 	void setFmFilterParams(float* newType, float* newCutoff, float* newQ);
@@ -40,13 +41,20 @@ private:
 
 	//==============================================================================
 	int wavetableSize = 0;
-	int pitchShift = 0;
 	float frequency = 0.0f;
 	float level = 0.0f;
-	float carrierEnvLevel = 0.0f;
-	float fmEnvLevel = 0.0f;
+	int pitchShift = 0;
+
+	float carrierFilterCutoff = 0.0f;
+	float carrierFilterType = 0.0f;
+	float carrierFilterQ = 0.0f;
+	
 	float fmFrequency = 0.0f;
 	float fmDepth = 0.0f;
+
+	float carrierEnvLevel = 0.0f;
+	float fmEnvLevel = 0.0f;
+	float carrierFilterEnvLevel = 0.0f;
 
 	float currentCarrierIndex = 0.0f;
 	float carrierTableDelta = 0.0f;
@@ -71,6 +79,10 @@ private:
 	IIRFilter fmFilter;
 	ADSR carrierEnvelope;
 	ADSR fmEnvelope;
+	ADSR carrierFilterEnvelope;
+
+	//==============================================================================
+	NormalisableRange<float> filterCutoffRange;
 
 	//==============================================================================
 	forcedinline float getNextSample() noexcept;

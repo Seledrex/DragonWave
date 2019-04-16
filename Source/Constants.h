@@ -39,6 +39,17 @@ public:
 	static const String CARRIER_ENV_RELEASE_NAME;
 	static const String CARRIER_ENV_LEVEL_ID;
 	static const String CARRIER_ENV_LEVEL_NAME;
+	static const String CARRIER_FILTER_ENV_ATTACK_ID;
+	static const String CARRIER_FILTER_ENV_ATTACK_NAME;
+	static const String CARRIER_FILTER_ENV_DECAY_ID;
+	static const String CARRIER_FILTER_ENV_DECAY_NAME;
+	static const String CARRIER_FILTER_ENV_SUSTAIN_ID;
+	static const String CARRIER_FILTER_ENV_SUSTAIN_NAME;
+	static const String CARRIER_FILTER_ENV_RELEASE_ID;
+	static const String CARRIER_FILTER_ENV_RELEASE_NAME;
+	static const String CARRIER_FILTER_ENV_LEVEL_ID;
+	static const String CARRIER_FILTER_ENV_LEVEL_NAME;
+	
 
 	//==============================================================================
 	static const String FM_WAVEFORM_TYPE_ID;
@@ -76,6 +87,7 @@ public:
 	static const String CARRIER_OSCILLATOR_TITLE;
 	static const String CARRIER_FILTER_TITLE;
 	static const String CARRIER_ENV_TITLE;
+	static const String CARRIER_FILTER_ENV_TITLE;
 
 	//==============================================================================
 	static const String FM_OSCILLOSCOPE_TITLE;

@@ -48,6 +48,7 @@ private:
 
 	Envelope carrierEnvGUI;
 	Envelope fmEnvGUI;
+	Envelope carrierFilterEnvGUI;
 
 	Menu menuGUI;
 

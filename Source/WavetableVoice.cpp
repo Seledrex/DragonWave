@@ -69,6 +69,7 @@ void WavetableVoice::startNote(
 	// Start attack phase
 	carrierEnvelope.noteOn();
 	fmEnvelope.noteOn();
+	carrierFilterEnvelope.noteOn();
 }
 
 void WavetableVoice::renderNextBlock(AudioSampleBuffer & outputBuffer, int startSample, int numSamples)
@@ -118,6 +119,7 @@ void WavetableVoice::stopNote(float /*velocity*/, bool allowTailOff)
 	{
 		carrierEnvelope.noteOff();
 		fmEnvelope.noteOff();
+		carrierFilterEnvelope.noteOff();
 	}
 	else
 	{
@@ -139,31 +141,49 @@ void WavetableVoice::setCarrierPitchShift(float* shift)
 	pitchShift = (int)*shift;
 }
 
-void WavetableVoice::setCarrierFilterParams(float* newType, float* newCutoff, float* newQ)
+void WavetableVoice::setCarrierFilterParams(float newType, float newCutoff, float newQ)
 {
-	int type = (int)* newType;
-	double cutoff = (double)* newCutoff;
-	double q = (double)* newQ;
+	carrierFilterType = newType;
+	carrierFilterCutoff = newCutoff;
+	carrierFilterQ = newQ;
 
-	switch (type)
+	switch ((int)carrierFilterType)
 	{
 	case 0:
-		carrierFilter.setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), cutoff, q));
+		carrierFilter.setCoefficients(IIRCoefficients::makeLowPass(
+			getSampleRate(),
+			(double)carrierFilterCutoff,
+			(double)carrierFilterQ));
 		break;
 	case 1:
-		carrierFilter.setCoefficients(IIRCoefficients::makeHighPass(getSampleRate(), cutoff, q));
+		carrierFilter.setCoefficients(IIRCoefficients::makeHighPass(
+			getSampleRate(),
+			(double)carrierFilterCutoff,
+			(double)carrierFilterQ));
 		break;
 	case 2:
-		carrierFilter.setCoefficients(IIRCoefficients::makeBandPass(getSampleRate(), cutoff, q));
+		carrierFilter.setCoefficients(IIRCoefficients::makeBandPass(
+			getSampleRate(),
+			(double)carrierFilterCutoff,
+			(double)carrierFilterQ));
 		break;
 	case 3:
-		carrierFilter.setCoefficients(IIRCoefficients::makeNotchFilter(getSampleRate(), cutoff, q));
+		carrierFilter.setCoefficients(IIRCoefficients::makeNotchFilter(
+			getSampleRate(),
+			(double)carrierFilterCutoff,
+			(double)carrierFilterQ));
 		break;
 	case 4:
-		carrierFilter.setCoefficients(IIRCoefficients::makeAllPass(getSampleRate(), cutoff, q));
+		carrierFilter.setCoefficients(IIRCoefficients::makeAllPass(
+			getSampleRate(),
+			(double)carrierFilterCutoff,
+			(double)carrierFilterQ));
 		break;
 	default:
-		carrierFilter.setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), cutoff, q));
+		carrierFilter.setCoefficients(IIRCoefficients::makeLowPass(
+			getSampleRate(),
+			(double)carrierFilterCutoff,
+			(double)carrierFilterQ));
 	}
 }
 
@@ -172,6 +192,25 @@ void WavetableVoice::setCarrierEnvParams(float* newAttack, float* newDecay, floa
 	carrierEnvelope.setSampleRate(getSampleRate());
 	carrierEnvelope.setParameters({ *newAttack, *newDecay, *newSustain, *newRelease });
 	carrierEnvLevel = *newLevel;
+}
+
+void WavetableVoice::setCarrierFilterEnvParams(float* newAttack, float* newDecay, float* newSustain, float* newRelease, float* newLevel)
+{
+	carrierFilterEnvelope.setSampleRate(getSampleRate());
+	carrierFilterEnvelope.setParameters({ *newAttack, *newDecay, *newSustain, *newRelease });
+	carrierFilterEnvLevel = *newLevel;
+
+	if (carrierFilterEnvLevel <= 0.0f)
+		filterCutoffRange = NormalisableRange<float>(
+			20.0f + (carrierFilterCutoff - 20.0f) * (1.0f + carrierFilterEnvLevel),
+			carrierFilterCutoff + 0.001f
+		);
+	else
+		filterCutoffRange = NormalisableRange<float>(
+			carrierFilterCutoff,
+			carrierFilterCutoff + (20000.0f - carrierFilterCutoff) * carrierFilterEnvLevel
+		);
+
 }
 
 void WavetableVoice::setFmOscParams(float* newFrequency, float* newDepth)
@@ -193,29 +232,29 @@ void WavetableVoice::setFmOscParams(float* newFrequency, float* newDepth)
 
 void WavetableVoice::setFmFilterParams(float* newType, float* newCutoff, float* newQ)
 {
-	int type = (int)* newType;
-	double cutoff = (double)* newCutoff;
-	double q = (double)* newQ;
+	int fmFilterType = (int)* newType;
+	double fmFilterCutoff = (double)* newCutoff;
+	double fmFilterQ = (double)* newQ;
 
-	switch (type)
+	switch (fmFilterType)
 	{
 	case 0:
-		fmFilter.setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), cutoff, q));
+		fmFilter.setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), fmFilterCutoff, fmFilterQ));
 		break;
 	case 1:
-		fmFilter.setCoefficients(IIRCoefficients::makeHighPass(getSampleRate(), cutoff, q));
+		fmFilter.setCoefficients(IIRCoefficients::makeHighPass(getSampleRate(), fmFilterCutoff, fmFilterQ));
 		break;
 	case 2:
-		fmFilter.setCoefficients(IIRCoefficients::makeBandPass(getSampleRate(), cutoff, q));
+		fmFilter.setCoefficients(IIRCoefficients::makeBandPass(getSampleRate(), fmFilterCutoff, fmFilterQ));
 		break;
 	case 3:
-		fmFilter.setCoefficients(IIRCoefficients::makeNotchFilter(getSampleRate(), cutoff, q));
+		fmFilter.setCoefficients(IIRCoefficients::makeNotchFilter(getSampleRate(), fmFilterCutoff, fmFilterQ));
 		break;
 	case 4:
-		fmFilter.setCoefficients(IIRCoefficients::makeAllPass(getSampleRate(), cutoff, q));
+		fmFilter.setCoefficients(IIRCoefficients::makeAllPass(getSampleRate(), fmFilterCutoff, fmFilterQ));
 		break;
 	default:
-		fmFilter.setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), cutoff, q));
+		fmFilter.setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), fmFilterCutoff, fmFilterQ));
 	}
 }
 
@@ -255,6 +294,8 @@ forcedinline float WavetableVoice::getNextSample() noexcept
 	auto currentSample = currentSampleLo * (1.0f - carrierWavetableMix) + currentSampleHi * carrierWavetableMix;
 
 	// Apply filter
+	float currentFilterEnvSample = carrierFilterEnvelope.getNextSample();
+	setCarrierFilterParams(carrierFilterType, filterCutoffRange.convertFrom0to1(currentFilterEnvSample), carrierFilterQ);
 	currentSample = carrierFilter.processSingleSampleRaw(currentSample);
 
 	return currentSample;
