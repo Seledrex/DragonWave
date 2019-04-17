@@ -380,21 +380,6 @@ bool DragonWaveAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts
 
 void DragonWaveAudioProcessor::processBlock(AudioBuffer<float> & buffer, MidiBuffer & midiMessages)
 {
-	// Keep track of note on count for the editor animation
-	int time;
-	MidiMessage m;
-	for (MidiBuffer::Iterator i(midiMessages); i.getNextEvent(m, time);)
-	{
-		if (m.isNoteOn())
-			noteOnCount++;
-		else if (m.isNoteOff())
-			noteOnCount--;
-	}
-
-	// Make sure count does not go negative!
-	if (noteOnCount < 0)
-		noteOnCount = 0;
-
 	// Add or remove voices from the synth
 	int numVoices = (int)* parameters.getRawParameterValue(Constants::CARRIER_OSC_VOICES_ID);
 	if (numVoices < synth.getNumVoices())

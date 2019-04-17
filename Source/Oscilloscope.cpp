@@ -44,21 +44,18 @@ void Oscilloscope::paint (Graphics& g)
 	float animationWidth = areaWidth - Constants::PADDING * 2;
 	float animationHeight = areaHeight - Constants::PADDING * 2;
 
-	// Keep a copy of the current sound
-	int retainedNoteOnCount = processor.noteOnCount;
-
 	// Do not draw waveform if there is none to draw
 	if (retainedCurrentWavetable == nullptr) {
 		return;
 	}
 
-	// Get sound and ensure it's initialized
-	auto* sound = retainedCurrentWavetable->getWavetable();
+	// Get wavetable
+	auto* wavetable = retainedCurrentWavetable->getWavetable();
 
 	// Downsample wavetable
 	std::vector<float> downsampledWavetable;
 	for (int i = 0; i < Wavetable::wavetableSize; i += downsamplingFactor)
-		downsampledWavetable.push_back(sound->getWavetables().getSample(0, i));
+		downsampledWavetable.push_back(wavetable->getWavetables().getSample(0, i));
 
 	// Set size to be the downsampled size
 	int wavetableSize = (int)downsampledWavetable.size();
@@ -91,40 +88,6 @@ void Oscilloscope::paint (Graphics& g)
 	g.setColour(getLookAndFeel().findColour(Slider::thumbColourId));
 	g.strokePath(staticPath, PathStrokeType(4.0f));
 
-	// Check if the note on count is more than 0
-	if (retainedNoteOnCount > 0)
-	{
-		// Create animated waveform path
-		Path animatedPath;
-		int animatedPathSize = wavetableSize / 4;
-		int animatedPathDelta = frameCount * 50 % wavetableSize + wavetableSize / 2;
-
-		std::vector<int> animatedIndices;
-		for (int i = -1 * animatedPathSize / 2; i < animatedPathSize / 2; i++)
-		{
-			int currentIndex = animatedPathDelta + i;
-			animatedIndices.push_back(currentIndex % wavetableSize);
-		}
-
-		for (int i = 0; i < animatedIndices.size(); i++)
-		{
-			int index = animatedIndices[i];
-			float sample = downsampledWavetable[index];
-			float y = yOffset + -1.0f * yRange.convertFrom0to1((sample + 1.0f) / 2.0f);
-			x = getWidth() / 2.0f - animationWidth / 2.0f + dx * index;
-			Point<float> p(x, y);
-
-			if (i == 0)
-				animatedPath.startNewSubPath(p);
-			else
-				animatedPath.lineTo(p);
-		}
-
-		// Draw animated waveform path
-		g.setColour(Colours::antiquewhite);
-		g.strokePath(animatedPath, PathStrokeType(4.0f));
-	}
-
 	// Draw border
 	g.setColour(Colours::white);
 	g.drawRoundedRectangle(area, (float)Constants::PADDING, 2.0f);
@@ -132,11 +95,6 @@ void Oscilloscope::paint (Graphics& g)
 
 void Oscilloscope::resized()
 {
-}
-
-void Oscilloscope::incrementFrameCount()
-{
-	frameCount++;
 }
 
 void Oscilloscope::setSound(ReferenceCountedWavetable::Ptr wavetable)

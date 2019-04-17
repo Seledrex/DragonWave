@@ -70,9 +70,6 @@ public:
 	IIRFilter iirFilterRight;
 
 	//==============================================================================
-	int noteOnCount = 0;
-
-	//==============================================================================
 	std::unique_ptr<LoadingThread> loadingThread;
 	ReferenceCountedArray<ReferenceCountedWavetable> carrierWavetables;
 	ReferenceCountedArray<ReferenceCountedWavetable> fmWavetables;

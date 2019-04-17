@@ -27,7 +27,6 @@ public:
     void resized() override;
 
 	//=============================================================================
-	void incrementFrameCount();
 	void setSound(ReferenceCountedWavetable::Ptr sound);
 
 private:
@@ -38,7 +37,6 @@ private:
 	ReferenceCountedWavetable::Ptr retainedCurrentWavetable;
 
 	//==============================================================================
-	int frameCount = 0;
 	int downsamplingFactor = 2;
 
 	//==============================================================================

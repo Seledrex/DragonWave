@@ -56,7 +56,7 @@ DragonWaveAudioProcessorEditor::DragonWaveAudioProcessorEditor(DragonWaveAudioPr
 		Constants::CARRIER_FILTER_ENV_LEVEL_ID)
 {
 	setSize(Constants::EDITOR_WIDTH, Constants::EDITOR_HEIGHT);
-	startTimerHz(60);
+	startTimerHz(5);
 
 	addAndMakeVisible(carrierOscilloscopeGUI);
 	addAndMakeVisible(carrierOscGUI);
@@ -110,9 +110,6 @@ void DragonWaveAudioProcessorEditor::timerCallback()
 {
 	carrierOscilloscopeGUI.setSound(ReferenceCountedWavetable::Ptr(processor.currentCarrierWavetable));
 	fmOscilloscopeGUI.setSound(ReferenceCountedWavetable::Ptr(processor.currentFMWavetable));
-
-	carrierOscilloscopeGUI.incrementFrameCount();
-	fmOscilloscopeGUI.incrementFrameCount();
 
 	carrierOscilloscopeGUI.repaint();
 	fmOscilloscopeGUI.repaint();
