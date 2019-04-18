@@ -7,6 +7,8 @@
               headerPath="C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.3.203\windows\mkl\include">
   <MAINGROUP id="TK3EPU" name="DragonWave">
     <GROUP id="{388B9577-A319-1C78-64C1-E413A09BEB49}" name="Source">
+      <FILE id="DmFSeK" name="Effects.cpp" compile="1" resource="0" file="Source/Effects.cpp"/>
+      <FILE id="iRlPXh" name="Effects.h" compile="0" resource="0" file="Source/Effects.h"/>
       <FILE id="cBhnHd" name="Menu.cpp" compile="1" resource="0" file="Source/Menu.cpp"/>
       <FILE id="t7581o" name="Menu.h" compile="0" resource="0" file="Source/Menu.h"/>
       <FILE id="txHNDh" name="Constants.cpp" compile="1" resource="0" file="Source/Constants.cpp"/>

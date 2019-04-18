@@ -18,6 +18,7 @@
 #include "Filter.h"
 #include "Envelope.h"
 #include "Menu.h"
+#include "Effects.h"
 
 //==============================================================================
 /**
@@ -51,6 +52,7 @@ private:
 	Envelope carrierFilterEnvGUI;
 
 	Menu menuGUI;
+	Effects effectsGUI;
 
 	//==============================================================================
 	void timerCallback() override;

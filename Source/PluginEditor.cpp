@@ -54,7 +54,8 @@ DragonWaveAudioProcessorEditor::DragonWaveAudioProcessorEditor(DragonWaveAudioPr
 		Constants::CARRIER_FILTER_ENV_SUSTAIN_ID,
 		Constants::CARRIER_FILTER_ENV_RELEASE_ID,
 		Constants::CARRIER_FILTER_ENV_LEVEL_ID,
-		true)
+		true),
+	effectsGUI(p)
 {
 	setSize(Constants::EDITOR_WIDTH, Constants::EDITOR_HEIGHT);
 	startTimerHz(5);
@@ -71,6 +72,7 @@ DragonWaveAudioProcessorEditor::DragonWaveAudioProcessorEditor(DragonWaveAudioPr
 
 	addAndMakeVisible(menuGUI);
 	addAndMakeVisible(carrierFilterEnvGUI);
+	addAndMakeVisible(effectsGUI);
 }
 
 DragonWaveAudioProcessorEditor::~DragonWaveAudioProcessorEditor()
@@ -104,6 +106,7 @@ void DragonWaveAudioProcessorEditor::resized()
 	// Set up column three components
 	menuGUI.setBounds(column3.removeFromTop(Constants::COMPONENT_HEIGHT));
 	carrierFilterEnvGUI.setBounds(column3.removeFromTop(Constants::COMPONENT_HEIGHT));
+	effectsGUI.setBounds(column3.removeFromTop(Constants::COMPONENT_HEIGHT));
 }
 
 //==============================================================================
