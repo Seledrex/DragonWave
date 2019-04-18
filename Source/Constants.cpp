@@ -117,3 +117,4 @@ const String Constants::DECAY = "Decay";
 const String Constants::SUSTAIN = "Sustain";
 const String Constants::RELEASE = "Release";
 const String Constants::LEVEL = "Level";
+const String Constants::DEPTH = "Depth";

@@ -30,7 +30,7 @@ public:
 	void setCarrierPitchShift(float* shift);
 	void setCarrierFilterParams(float newType, float newCutoff, float newQ);
 	void setCarrierEnvParams(float* newAttack, float* newDecay, float* newSustain, float* newRelease, float* newLevel);
-	void setCarrierFilterEnvParams(float* newAttack, float* newDecay, float* newSustain, float* newRelease, float* newLevel);
+	void setCarrierFilterEnvParams(float* newAttack, float* newDecay, float* newSustain, float* newRelease, float* newDepth);
 
 	//==============================================================================
 	void setFmOscParams(float* newFrequency, float* newDepth);
@@ -83,6 +83,9 @@ private:
 
 	//==============================================================================
 	NormalisableRange<float> filterCutoffRange;
+	float filterCutoffLowerBound = 0.0f;
+	float filterCutoffUpperBound = 0.0f;
+	float filterCutoffDirection = 1.0f;
 
 	//==============================================================================
 	forcedinline float getNextSample() noexcept;

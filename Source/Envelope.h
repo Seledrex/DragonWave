@@ -12,13 +12,16 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
+#include "MidpointSlider.h"
 
 //==============================================================================
 
 class Envelope    : public Component
 {
 public:
-    Envelope(DragonWaveAudioProcessor& p, String title, String attackId, String decayId, String sustainId, String releaseId, String levelId);
+    Envelope(DragonWaveAudioProcessor& p, String title,
+		String attackId, String decayId, String sustainId, String releaseId,
+		String levelId, bool isFilterEnvelope = false);
     ~Envelope();
 
     void paint (Graphics&) override;
@@ -26,6 +29,7 @@ public:
 
 private:
 	DragonWaveAudioProcessor& processor;
+	MidpointSlider midpointSliderLAF;
 
 	//==============================================================================
 	String title;

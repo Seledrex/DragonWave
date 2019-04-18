@@ -273,7 +273,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 	auto carrierFilterEnvelopeLevel = std::make_unique<AudioParameterFloat>(
 		Constants::CARRIER_FILTER_ENV_LEVEL_ID,
 		Constants::CARRIER_FILTER_ENV_LEVEL_NAME,
-		NormalisableRange<float>(-1.0f, 1.0f, 0.001f),
+		NormalisableRange<float>(-1.0f, 1.0f, 0.001f, 0.4f, true),
 		0.0f
 	);
 	params.push_back(std::move(carrierFilterEnvelopeLevel));

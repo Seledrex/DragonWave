@@ -50,7 +50,6 @@ public:
 	static const String CARRIER_FILTER_ENV_LEVEL_ID;
 	static const String CARRIER_FILTER_ENV_LEVEL_NAME;
 	
-
 	//==============================================================================
 	static const String FM_WAVEFORM_TYPE_ID;
 	static const String FM_WAVEFORM_PATH_ID;
@@ -124,4 +123,5 @@ public:
 	static const String SUSTAIN;
 	static const String RELEASE;
 	static const String LEVEL;
+	static const String DEPTH;
 };

@@ -194,37 +194,35 @@ void WavetableVoice::setCarrierEnvParams(float* newAttack, float* newDecay, floa
 	carrierEnvLevel = *newLevel;
 }
 
-void WavetableVoice::setCarrierFilterEnvParams(float* newAttack, float* newDecay, float* newSustain, float* newRelease, float* newLevel)
+void WavetableVoice::setCarrierFilterEnvParams(float* newAttack, float* newDecay, float* newSustain, float* newRelease, float* newDepth)
 {
 	carrierFilterEnvelope.setSampleRate(getSampleRate());
 	carrierFilterEnvelope.setParameters({ *newAttack, *newDecay, *newSustain, *newRelease });
-	carrierFilterEnvLevel = *newLevel;
+	carrierFilterEnvLevel = *newDepth;
 
 	if (carrierFilterEnvLevel <= 0.0f)
-		filterCutoffRange = NormalisableRange<float>(
-			20.0f + (carrierFilterCutoff - 20.0f) * (1.0f + carrierFilterEnvLevel),
-			carrierFilterCutoff + 0.001f
-		);
+	{
+		filterCutoffLowerBound = 20.0f + (carrierFilterCutoff - 20.0f) * (1.0f + carrierFilterEnvLevel);
+		filterCutoffUpperBound = carrierFilterCutoff + 0.001f;
+		filterCutoffDirection = -1.0f;
+	}
 	else
-		filterCutoffRange = NormalisableRange<float>(
-			carrierFilterCutoff,
-			carrierFilterCutoff + (20000.0f - carrierFilterCutoff) * carrierFilterEnvLevel
-		);
-
+	{
+		filterCutoffLowerBound = carrierFilterCutoff;
+		filterCutoffUpperBound = carrierFilterCutoff + (20000.0f - carrierFilterCutoff) * carrierFilterEnvLevel;
+		filterCutoffDirection = 1.0f;
+	}
 }
 
 void WavetableVoice::setFmOscParams(float* newFrequency, float* newDepth)
 {
 	// Update frequency modulation phase change
-	auto frequencyMultiplierRange = NormalisableRange<float>(0.125f, 3.0f);
-	float newFmFrequency = frequency * frequencyMultiplierRange.convertFrom0to1(*newFrequency);
+	float newFmFrequency = frequency * jmap(*newFrequency, 0.125f, 3.0f);
 	fmTableDelta = newFmFrequency * wavetableSize / (float)getSampleRate();
 
 	// Update frequency modulation depth
-	if (frequency > 0.0f) {
-		auto depthRange = NormalisableRange<float>(0.0f, frequency);
-		fmDepth = depthRange.convertFrom0to1(*newDepth);
-	}
+	if (frequency > 0.0f)
+		fmDepth = jmap(*newDepth, 0.0f, frequency);
 	else
 		fmDepth = 0.0f;
 	
@@ -295,7 +293,9 @@ forcedinline float WavetableVoice::getNextSample() noexcept
 
 	// Apply filter
 	float currentFilterEnvSample = carrierFilterEnvelope.getNextSample();
-	setCarrierFilterParams(carrierFilterType, filterCutoffRange.convertFrom0to1(currentFilterEnvSample), carrierFilterQ);
+	float newCutoff = jmap(filterCutoffDirection == -1.0f ? 1 - currentFilterEnvSample : currentFilterEnvSample, filterCutoffLowerBound, filterCutoffUpperBound);
+
+	setCarrierFilterParams(carrierFilterType, newCutoff, carrierFilterQ);
 	currentSample = carrierFilter.processSingleSampleRaw(currentSample);
 
 	return currentSample;

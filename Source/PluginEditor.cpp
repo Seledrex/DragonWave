@@ -53,7 +53,8 @@ DragonWaveAudioProcessorEditor::DragonWaveAudioProcessorEditor(DragonWaveAudioPr
 		Constants::CARRIER_FILTER_ENV_DECAY_ID,
 		Constants::CARRIER_FILTER_ENV_SUSTAIN_ID,
 		Constants::CARRIER_FILTER_ENV_RELEASE_ID,
-		Constants::CARRIER_FILTER_ENV_LEVEL_ID)
+		Constants::CARRIER_FILTER_ENV_LEVEL_ID,
+		true)
 {
 	setSize(Constants::EDITOR_WIDTH, Constants::EDITOR_HEIGHT);
 	startTimerHz(5);

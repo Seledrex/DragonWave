@@ -53,6 +53,10 @@
       <FILE id="zmcgUk" name="Envelope.h" compile="0" resource="0" file="Source/Envelope.h"/>
       <FILE id="txNEvp" name="Filter.cpp" compile="1" resource="0" file="Source/Filter.cpp"/>
       <FILE id="M2pOyH" name="Filter.h" compile="0" resource="0" file="Source/Filter.h"/>
+      <FILE id="QqGuLe" name="MidpointSlider.cpp" compile="1" resource="0"
+            file="Source/MidpointSlider.cpp"/>
+      <FILE id="MuIx98" name="MidpointSlider.h" compile="0" resource="0"
+            file="Source/MidpointSlider.h"/>
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>

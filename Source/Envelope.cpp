@@ -12,7 +12,9 @@
 #include "Envelope.h"
 
 //==============================================================================
-Envelope::Envelope(DragonWaveAudioProcessor& p, String title, String attackId, String decayId, String sustainId, String releaseId, String levelId) :
+Envelope::Envelope(DragonWaveAudioProcessor& p, String title,
+	String attackId, String decayId, String sustainId, String releaseId,
+	String levelId, bool isFilterEnvelope) :
 	processor(p)
 {
 	setSize(Constants::COMPONENT_WIDTH, Constants::COMPONENT_HEIGHT);
@@ -21,46 +23,31 @@ Envelope::Envelope(DragonWaveAudioProcessor& p, String title, String attackId, S
 	int textBoxWidth = 0;
 	int textBoxHeight = 0;
 
+	//==============================================================================
 	addAndMakeVisible(attackSlider);
 	attackSlider.setSliderStyle(Slider::SliderStyle::LinearVertical);
-	attackSlider.setRange(0.001f, 5.0f, 0.001f);
-	attackSlider.setSkewFactor(0.5);
 	attackSlider.setTextBoxStyle(Slider::NoTextBox, false, textBoxWidth, textBoxHeight);
-	attackSlider.setNumDecimalPlacesToDisplay(3);
-	attackSlider.setTextValueSuffix("s");
 
 	addAndMakeVisible(decaySlider);
 	decaySlider.setSliderStyle(Slider::SliderStyle::LinearVertical);
-	decaySlider.setRange(0.001f, 5.0f, 0.001f);
-	decaySlider.setSkewFactor(0.5);
 	decaySlider.setTextBoxStyle(Slider::NoTextBox, false, textBoxWidth, textBoxHeight);
-	decaySlider.setNumDecimalPlacesToDisplay(3);
-	decaySlider.setTextValueSuffix("s");
 
 	addAndMakeVisible(sustainSlider);
 	sustainSlider.setSliderStyle(Slider::SliderStyle::LinearVertical);
-	sustainSlider.setRange(0.0f, 1.0f);
-	sustainSlider.setSkewFactor(0.5);
 	sustainSlider.setTextBoxStyle(Slider::NoTextBox, false, textBoxWidth, textBoxHeight);
-	sustainSlider.setNumDecimalPlacesToDisplay(3);
-	sustainSlider.setTextValueSuffix("s");
 
 	addAndMakeVisible(releaseSlider);
 	releaseSlider.setSliderStyle(Slider::SliderStyle::LinearVertical);
-	releaseSlider.setRange(0.001f, 5.0f, 0.001f);
-	releaseSlider.setSkewFactor(0.5);
 	releaseSlider.setTextBoxStyle(Slider::NoTextBox, false, textBoxWidth, textBoxHeight);
-	releaseSlider.setNumDecimalPlacesToDisplay(3);
-	releaseSlider.setTextValueSuffix("s");
 
 	addAndMakeVisible(levelSlider);
 	levelSlider.setSliderStyle(Slider::SliderStyle::LinearVertical);
-	levelSlider.setRange(0.0f, 1.0f);
-	levelSlider.setSkewFactor(0.5);
 	levelSlider.setTextBoxStyle(Slider::NoTextBox, false, textBoxWidth, textBoxHeight);
-	levelSlider.setNumDecimalPlacesToDisplay(3);
-	levelSlider.setTextValueSuffix("s");
 
+	if (isFilterEnvelope)
+		levelSlider.setLookAndFeel(&midpointSliderLAF);
+
+	//==============================================================================
 	addAndMakeVisible(attackLabel);
 	attackLabel.setText(Constants::ATTACK, dontSendNotification);
 	attackLabel.setJustificationType(Justification::centredBottom);
@@ -78,9 +65,14 @@ Envelope::Envelope(DragonWaveAudioProcessor& p, String title, String attackId, S
 	releaseLabel.setJustificationType(Justification::centredBottom);
 
 	addAndMakeVisible(levelLabel);
-	levelLabel.setText(Constants::LEVEL, dontSendNotification);
 	levelLabel.setJustificationType(Justification::centredBottom);
 
+	if (isFilterEnvelope)
+		levelLabel.setText(Constants::DEPTH, dontSendNotification);
+	else
+		levelLabel.setText(Constants::LEVEL, dontSendNotification);
+	
+	//==============================================================================
 	attackAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(
 		processor.parameters, attackId, attackSlider);
 	decayAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(
