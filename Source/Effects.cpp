@@ -139,6 +139,15 @@ Effects::Effects(DragonWaveAudioProcessor& p)
 		processor.parameters, Constants::EQ_FREQUENCY_ID, frequencySlider);
 	highShelfAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(
 		processor.parameters, Constants::EQ_HIGH_SHELF_ID, highShelfSlider);
+
+	roomSizeAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(
+		processor.parameters, Constants::REVERB_SIZE_ID, roomSizeSlider);
+	dampingAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(
+		processor.parameters, Constants::REVERB_DAMP_ID, dampingSlider);
+	widthAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(
+		processor.parameters, Constants::REVERB_WIDTH_ID, widthSlider);
+	reverbMixAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(
+		processor.parameters, Constants::REVERB_MIX_ID, reverbMixSlider);
 }
 
 Effects::~Effects()

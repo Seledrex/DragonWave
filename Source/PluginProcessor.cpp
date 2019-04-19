@@ -313,6 +313,41 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 	);
 	params.push_back(std::move(eqHighShelf));
 
+	//==============================================================================
+	// Reverb Params
+	//==============================================================================
+	auto reverbSize = std::make_unique<AudioParameterFloat>(
+		Constants::REVERB_SIZE_ID,
+		Constants::REVERB_SIZE_NAME,
+		NormalisableRange<float>(0.0f, 1.0f),
+		0.0f
+	);
+	params.push_back(std::move(reverbSize));
+
+	auto reverbDamp = std::make_unique<AudioParameterFloat>(
+		Constants::REVERB_DAMP_ID,
+		Constants::REVERB_DAMP_NAME,
+		NormalisableRange<float>(0.0f, 1.0f),
+		0.0f
+	);
+	params.push_back(std::move(reverbDamp));
+
+	auto reverbWidth = std::make_unique<AudioParameterFloat>(
+		Constants::REVERB_WIDTH_ID,
+		Constants::REVERB_WIDTH_NAME,
+		NormalisableRange<float>(0.0f, 1.0f),
+		0.0f
+	);
+	params.push_back(std::move(reverbWidth));
+
+	auto reverbMix = std::make_unique<AudioParameterFloat>(
+		Constants::REVERB_MIX_ID,
+		Constants::REVERB_MIX_NAME,
+		NormalisableRange<float>(0.0f, 1.0f),
+		0.0f
+	);
+	params.push_back(std::move(reverbMix));
+
 	return { params.begin(), params.end() };
 }
 
@@ -382,6 +417,8 @@ void DragonWaveAudioProcessor::changeProgramName(int /*index*/, const String& /*
 void DragonWaveAudioProcessor::prepareToPlay(double sampleRate, int /*samplesPerBlock*/)
 {
 	synth.setCurrentPlaybackSampleRate(sampleRate);
+	reverb.setSampleRate(getSampleRate());
+	reverb.reset();
 }
 
 void DragonWaveAudioProcessor::releaseResources()
@@ -487,6 +524,16 @@ void DragonWaveAudioProcessor::processBlock(AudioBuffer<float> & buffer, MidiBuf
 	// Render synth audio
 	buffer.clear();
 	synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+
+	// Get reverb params
+	float reverbSize = *parameters.getRawParameterValue(Constants::REVERB_SIZE_ID);
+	float reverbDamp = *parameters.getRawParameterValue(Constants::REVERB_DAMP_ID);
+	float reverbWidth = *parameters.getRawParameterValue(Constants::REVERB_WIDTH_ID);
+	float reverbMix = *parameters.getRawParameterValue(Constants::REVERB_MIX_ID);
+
+	// Apply reverb
+	reverb.setParameters({ reverbSize, reverbDamp, reverbMix, (1.0f - reverbMix), reverbWidth, 0.0f });
+	reverb.processStereo(buffer.getWritePointer(0), buffer.getWritePointer(1), buffer.getNumSamples());
 
 	// Get eq params
 	double eqLowGain = (float)* parameters.getRawParameterValue(Constants::EQ_LOW_SHELF_ID);

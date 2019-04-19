@@ -66,8 +66,6 @@ public:
 	//==============================================================================
 	AudioProcessorValueTreeState parameters;
 	Synthesiser synth;
-	IIRFilter iirFilterLeft;
-	IIRFilter iirFilterRight;
 
 	//==============================================================================
 	std::unique_ptr<LoadingThread> loadingThread;
@@ -89,6 +87,9 @@ public:
 	IIRFilter midFilterR;
 	IIRFilter highFilterL;
 	IIRFilter highFilterR;
+
+	//==============================================================================
+	Reverb reverb;
 
 private:
 
