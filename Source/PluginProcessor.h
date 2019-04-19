@@ -82,6 +82,14 @@ public:
 	Wavetable::Waveform chosenCarrierWaveform = Wavetable::Waveform::Sawtooth;
 	Wavetable::Waveform chosenFMWaveform = Wavetable::Waveform::Sine;
 
+	//==============================================================================
+	IIRFilter lowFilterL;
+	IIRFilter lowFilterR;
+	IIRFilter midFilterL;
+	IIRFilter midFilterR;
+	IIRFilter highFilterL;
+	IIRFilter highFilterR;
+
 private:
 
 	//==============================================================================

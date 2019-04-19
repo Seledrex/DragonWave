@@ -96,8 +96,10 @@ void Menu::resized()
 
 void Menu::buttonClicked(Button* button)
 {
+	ignoreUnused(button);
 }
 
 void Menu::buttonStateChanged(Button* button)
 {
+	ignoreUnused(button);
 }

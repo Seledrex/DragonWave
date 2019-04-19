@@ -127,6 +127,18 @@ Effects::Effects(DragonWaveAudioProcessor& p)
 	addAndMakeVisible(reverbMixLabel);
 	reverbMixLabel.setText("Dry/Wet", dontSendNotification);
 	reverbMixLabel.setJustificationType(Justification::centred);
+
+	//==============================================================================
+	// Attachments
+	//==============================================================================
+	lowShelfAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(
+		processor.parameters, Constants::EQ_LOW_SHELF_ID, lowShelfSlider);
+	boostAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(
+		processor.parameters, Constants::EQ_BOOST_ID, boostSlider);
+	frequencyAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(
+		processor.parameters, Constants::EQ_FREQUENCY_ID, frequencySlider);
+	highShelfAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(
+		processor.parameters, Constants::EQ_HIGH_SHELF_ID, highShelfSlider);
 }
 
 Effects::~Effects()

@@ -278,6 +278,41 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 	);
 	params.push_back(std::move(carrierFilterEnvelopeLevel));
 
+	//==============================================================================
+	// Equalizer Params
+	//==============================================================================
+	auto eqLowShelf = std::make_unique<AudioParameterFloat>(
+		Constants::EQ_LOW_SHELF_ID,
+		Constants::EQ_LOW_SHELF_NAME,
+		NormalisableRange<float>(0.1f, 1.9f),
+		1.0f
+	);
+	params.push_back(std::move(eqLowShelf));
+
+	auto eqBoost = std::make_unique<AudioParameterFloat>(
+		Constants::EQ_BOOST_ID,
+		Constants::EQ_BOOST_NAME,
+		NormalisableRange<float>(0.1f, 1.9f),
+		1.0f
+	);
+	params.push_back(std::move(eqBoost));
+
+	auto eqFrequency = std::make_unique<AudioParameterFloat>(
+		Constants::EQ_FREQUENCY_ID,
+		Constants::EQ_FREQUENCY_NAME,
+		NormalisableRange<float>(250.0f, 2000.0f, 0.001f, 0.6f),
+		800.0f
+	);
+	params.push_back(std::move(eqFrequency));
+
+	auto eqHighShelf = std::make_unique<AudioParameterFloat>(
+		Constants::EQ_HIGH_SHELF_ID,
+		Constants::EQ_HIGH_SHELF_NAME,
+		NormalisableRange<float>(0.1f, 1.9f),
+		1.0f
+	);
+	params.push_back(std::move(eqHighShelf));
+
 	return { params.begin(), params.end() };
 }
 
@@ -452,6 +487,28 @@ void DragonWaveAudioProcessor::processBlock(AudioBuffer<float> & buffer, MidiBuf
 	// Render synth audio
 	buffer.clear();
 	synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+
+	// Get eq params
+	double eqLowGain = (float)* parameters.getRawParameterValue(Constants::EQ_LOW_SHELF_ID);
+	double eqMidGain = (float)* parameters.getRawParameterValue(Constants::EQ_BOOST_ID);
+	double eqMidFreq = (float)* parameters.getRawParameterValue(Constants::EQ_FREQUENCY_ID);
+	double eqHighGain = (float)* parameters.getRawParameterValue(Constants::EQ_HIGH_SHELF_ID);
+
+	// Set eq coefficients
+	lowFilterL.setCoefficients(IIRCoefficients::makeLowShelf(getSampleRate(), 250.0, 0.5, eqLowGain));
+	lowFilterR.setCoefficients(IIRCoefficients::makeLowShelf(getSampleRate(), 250.0, 0.5, eqLowGain));;
+	midFilterL.setCoefficients(IIRCoefficients::makePeakFilter(getSampleRate(), eqMidFreq, 0.5, eqMidGain));
+	midFilterR.setCoefficients(IIRCoefficients::makePeakFilter(getSampleRate(), eqMidFreq, 0.5, eqMidGain));
+	highFilterL.setCoefficients(IIRCoefficients::makeHighShelf(getSampleRate(), 2000.0, 0.5, eqHighGain));
+	highFilterR.setCoefficients(IIRCoefficients::makeHighShelf(getSampleRate(), 2000.0, 0.5, eqHighGain));
+
+	// Eq that shizz
+	lowFilterL.processSamples(buffer.getWritePointer(0), buffer.getNumSamples());
+	lowFilterR.processSamples(buffer.getWritePointer(1), buffer.getNumSamples());
+	midFilterL.processSamples(buffer.getWritePointer(0), buffer.getNumSamples());
+	midFilterR.processSamples(buffer.getWritePointer(1), buffer.getNumSamples());
+	highFilterL.processSamples(buffer.getWritePointer(0), buffer.getNumSamples());
+	highFilterR.processSamples(buffer.getWritePointer(1), buffer.getNumSamples());
 }
 
 //==============================================================================

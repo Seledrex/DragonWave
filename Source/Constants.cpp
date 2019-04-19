@@ -69,6 +69,28 @@ const String Constants::FM_ENV_LEVEL_ID = "fmEnvLevel";
 const String Constants::FM_ENV_LEVEL_NAME = "FME Level";
 
 //==============================================================================
+const String Constants::EQ_LOW_SHELF_ID = "eqLowShelf";
+const String Constants::EQ_LOW_SHELF_NAME = "EQ Low Shelf";
+const String Constants::EQ_BOOST_ID = "eqBoost";
+const String Constants::EQ_BOOST_NAME = "EQ Boost";
+const String Constants::EQ_FREQUENCY_ID = "eqFrequency";
+const String Constants::EQ_FREQUENCY_NAME = "EQ Freq";
+const String Constants::EQ_HIGH_SHELF_ID = "eqHighShelf";
+const String Constants::EQ_HIGH_SHELF_NAME = "EQ High Shelf";
+const String Constants::WS_SHAPE_ID = "wsShape";
+const String Constants::WS_SHAPE_NAME = "WS Shape";
+const String Constants::WS_MIX_ID = "wsMix";
+const String Constants::WS_MIX_NAME = "WS Dry/Wet";
+const String Constants::REVERB_SIZE_ID = "reverbSize";
+const String Constants::REVERB_SIZE_NAME = "Reverb Size";
+const String Constants::REVERB_DAMP_ID = "reverbDamp";
+const String Constants::REVERB_DAMP_NAME = "Reverb Damp";
+const String Constants::REVERB_WIDTH_ID = "reverbWidth";
+const String Constants::REVERB_WIDTH_NAME = "Reverb Width";
+const String Constants::REVERB_MIX_ID = "reverbMix";
+const String Constants::REVERB_MIX_NAME = "Reverb Dry/Wet";
+
+//==============================================================================
 const int Constants::EDITOR_WIDTH = 900;
 const int Constants::EDITOR_HEIGHT = 700;
 const int Constants::COMPONENT_WIDTH = EDITOR_WIDTH / 3;

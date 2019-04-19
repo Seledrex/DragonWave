@@ -75,6 +75,28 @@ public:
 	static const String FM_ENV_LEVEL_NAME;
 
 	//==============================================================================
+	static const String EQ_LOW_SHELF_ID;
+	static const String EQ_LOW_SHELF_NAME;
+	static const String EQ_BOOST_ID; 
+	static const String EQ_BOOST_NAME;
+	static const String EQ_FREQUENCY_ID;
+	static const String EQ_FREQUENCY_NAME;
+	static const String EQ_HIGH_SHELF_ID;
+	static const String EQ_HIGH_SHELF_NAME;
+	static const String WS_SHAPE_ID;
+	static const String WS_SHAPE_NAME;
+	static const String WS_MIX_ID;
+	static const String WS_MIX_NAME;
+	static const String REVERB_SIZE_ID;
+	static const String REVERB_SIZE_NAME;
+	static const String REVERB_DAMP_ID;
+	static const String REVERB_DAMP_NAME;
+	static const String REVERB_WIDTH_ID;
+	static const String REVERB_WIDTH_NAME;
+	static const String REVERB_MIX_ID;
+	static const String REVERB_MIX_NAME;
+
+	//==============================================================================
 	static const int EDITOR_WIDTH;
 	static const int EDITOR_HEIGHT;
 	static const int COMPONENT_WIDTH;
