@@ -14,6 +14,7 @@
 #include "WavetableSound.h"
 #include "ReferenceCountedWavetable.h"
 #include "Constants.h"
+#include "Waveshaper.h"
 
 //==============================================================================
 class LoadingThread;
@@ -90,6 +91,7 @@ public:
 
 	//==============================================================================
 	Reverb reverb;
+	Waveshaper waveshaper;
 
 private:
 

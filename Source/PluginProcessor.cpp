@@ -348,6 +348,31 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 	);
 	params.push_back(std::move(reverbMix));
 
+	//==============================================================================
+	// Waveshaper Params
+	//==============================================================================
+	auto wsShape = std::make_unique<AudioParameterChoice>(
+		Constants::WS_SHAPE_ID,
+		Constants::WS_SHAPE_NAME,
+		StringArray(
+			"Faint",
+			"Light",
+			"Moderate",
+			"Heavy",
+			"Harsh"
+		),
+		0
+	);
+	params.push_back(std::move(wsShape));
+
+	auto wsMix = std::make_unique<AudioParameterFloat>(
+		Constants::WS_MIX_ID,
+		Constants::WS_MIX_NAME,
+		NormalisableRange<float>(0.0f, 1.0f),
+		0.0f
+	);
+	params.push_back(std::move(wsMix));
+
 	return { params.begin(), params.end() };
 }
 
@@ -525,6 +550,14 @@ void DragonWaveAudioProcessor::processBlock(AudioBuffer<float> & buffer, MidiBuf
 	buffer.clear();
 	synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 
+	// Get waveshaper params
+	auto wsShape = static_cast<Waveshaper::TransferFunction>((int)* parameters.getRawParameterValue(Constants::WS_SHAPE_ID));
+	float wsMix = (float)* parameters.getRawParameterValue(Constants::WS_MIX_ID);
+	waveshaper.setParameters(wsShape, 1.0f - wsMix, wsMix);
+
+	// Apply waveshaping
+	waveshaper.processStereo(buffer.getWritePointer(0), buffer.getWritePointer(1), buffer.getNumSamples());
+
 	// Get reverb params
 	float reverbSize = *parameters.getRawParameterValue(Constants::REVERB_SIZE_ID);
 	float reverbDamp = *parameters.getRawParameterValue(Constants::REVERB_DAMP_ID);
@@ -556,6 +589,8 @@ void DragonWaveAudioProcessor::processBlock(AudioBuffer<float> & buffer, MidiBuf
 	midFilterR.processSamples(buffer.getWritePointer(1), buffer.getNumSamples());
 	highFilterL.processSamples(buffer.getWritePointer(0), buffer.getNumSamples());
 	highFilterR.processSamples(buffer.getWritePointer(1), buffer.getNumSamples());
+
+	
 }
 
 //==============================================================================

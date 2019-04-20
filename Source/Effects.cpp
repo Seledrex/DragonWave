@@ -69,11 +69,11 @@ Effects::Effects(DragonWaveAudioProcessor& p)
 	//==============================================================================
 	i = 0;
 	addAndMakeVisible(waveshaperMenu);
-	waveshaperMenu.addItem("Very Good Boi", ++i);
-	waveshaperMenu.addItem("Good Boi", ++i);
-	waveshaperMenu.addItem("Average Boi", ++i);
-	waveshaperMenu.addItem("Bad Boi", ++i);
-	waveshaperMenu.addItem("Very Bad Boi", ++i);
+	waveshaperMenu.addItem("Faint", ++i);
+	waveshaperMenu.addItem("Light", ++i);
+	waveshaperMenu.addItem("Moderate", ++i);
+	waveshaperMenu.addItem("Heavy", ++i);
+	waveshaperMenu.addItem("Harsh", ++i);
 	waveshaperMenu.setJustificationType(Justification::centredLeft);
 	waveshaperMenu.setSelectedId(1, dontSendNotification);
 
@@ -148,6 +148,11 @@ Effects::Effects(DragonWaveAudioProcessor& p)
 		processor.parameters, Constants::REVERB_WIDTH_ID, widthSlider);
 	reverbMixAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(
 		processor.parameters, Constants::REVERB_MIX_ID, reverbMixSlider);
+
+	waveshaperMenuAttach = std::make_unique<AudioProcessorValueTreeState::ComboBoxAttachment>(
+		processor.parameters, Constants::WS_SHAPE_ID, waveshaperMenu);
+	waveshaperMixAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(
+		processor.parameters, Constants::WS_MIX_ID, waveshaperMixSlider);
 }
 
 Effects::~Effects()

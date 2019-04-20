@@ -59,6 +59,8 @@
             file="Source/MidpointSlider.cpp"/>
       <FILE id="MuIx98" name="MidpointSlider.h" compile="0" resource="0"
             file="Source/MidpointSlider.h"/>
+      <FILE id="LkrdEb" name="Waveshaper.cpp" compile="1" resource="0" file="Source/Waveshaper.cpp"/>
+      <FILE id="T5kIxq" name="Waveshaper.h" compile="0" resource="0" file="Source/Waveshaper.h"/>
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
