@@ -618,10 +618,10 @@ void DragonWaveAudioProcessor::processBlock(AudioBuffer<float> & buffer, MidiBuf
 	reverb.processStereo(buffer.getWritePointer(0), buffer.getWritePointer(1), buffer.getNumSamples());
 
 	// Get eq params
-	double eqLowGain = (float)* parameters.getRawParameterValue(Constants::EQ_LOW_SHELF_ID);
-	double eqMidGain = (float)* parameters.getRawParameterValue(Constants::EQ_BOOST_ID);
-	double eqMidFreq = (float)* parameters.getRawParameterValue(Constants::EQ_FREQUENCY_ID);
-	double eqHighGain = (float)* parameters.getRawParameterValue(Constants::EQ_HIGH_SHELF_ID);
+	double eqLowGain = (double)* parameters.getRawParameterValue(Constants::EQ_LOW_SHELF_ID);
+	double eqMidGain = (double)* parameters.getRawParameterValue(Constants::EQ_BOOST_ID);
+	double eqMidFreq = (double)* parameters.getRawParameterValue(Constants::EQ_FREQUENCY_ID);
+	double eqHighGain = (double)* parameters.getRawParameterValue(Constants::EQ_HIGH_SHELF_ID);
 
 	// Set eq coefficients
 	lowFilterL.setCoefficients(IIRCoefficients::makeLowShelf(getSampleRate(), 250.0, 0.5, eqLowGain));
@@ -639,7 +639,17 @@ void DragonWaveAudioProcessor::processBlock(AudioBuffer<float> & buffer, MidiBuf
 	highFilterL.processSamples(buffer.getWritePointer(0), buffer.getNumSamples());
 	highFilterR.processSamples(buffer.getWritePointer(1), buffer.getNumSamples());
 
-	
+	// Get master gain
+	currentGain = *parameters.getRawParameterValue(Constants::MASTER_ID);
+
+	// Apply gain
+	if (currentGain == previousGain)
+		buffer.applyGain(currentGain);
+	else
+	{
+		buffer.applyGainRamp(0, buffer.getNumSamples(), previousGain, currentGain);
+		previousGain = currentGain;
+	}
 }
 
 //==============================================================================
