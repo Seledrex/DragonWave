@@ -30,7 +30,7 @@ Menu::Menu(DragonWaveAudioProcessor& p) :
 	resetButton.addListener(this);
 
 	addAndMakeVisible(presetLabel);
-	presetLabel.setText(Constants::RESET, dontSendNotification);
+	presetLabel.setText(Constants::NEW_PATCH, dontSendNotification);
 	presetLabel.setJustificationType(Justification::centred);
 	presetLabel.setColour(0, Colours::white);
 }
