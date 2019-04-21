@@ -75,6 +75,8 @@ public:
 	static const String FM_ENV_LEVEL_NAME;
 
 	//==============================================================================
+	static const String EFFECT_TYPE_ID;
+	static const String EFFECT_TYPE_NAME;
 	static const String EQ_LOW_SHELF_ID;
 	static const String EQ_LOW_SHELF_NAME;
 	static const String EQ_BOOST_ID; 
@@ -97,6 +99,16 @@ public:
 	static const String REVERB_MIX_NAME;
 
 	//==============================================================================
+	static const String UNISON_ID;
+	static const String UNISON_NAME;
+	static const String DETUNE_ID;
+	static const String DETUNE_NAME;
+	static const String SPREAD_ID;
+	static const String SPREAD_NAME;
+	static const String MASTER_ID;
+	static const String MASTER_NAME;
+
+	//==============================================================================
 	static const int EDITOR_WIDTH;
 	static const int EDITOR_HEIGHT;
 	static const int COMPONENT_WIDTH;
@@ -109,12 +121,13 @@ public:
 	static const String CARRIER_FILTER_TITLE;
 	static const String CARRIER_ENV_TITLE;
 	static const String CARRIER_FILTER_ENV_TITLE;
-
-	//==============================================================================
 	static const String FM_OSCILLOSCOPE_TITLE;
 	static const String FM_OSCILLATOR_TITLE;
 	static const String FM_FILTER_TITLE;
 	static const String FM_ENV_TITLE;
+	static const String MENU_TITLE;
+	static const String EFFECTS_TITLE;
+	static const String GLOBAL_TITLE;
 
 	//==============================================================================
 	static const String SINE;
@@ -126,6 +139,10 @@ public:
 	//==============================================================================
 	static const String OPEN_WAVETABLE;
 	static const String SELECT_WAVETABLE;
+	static const String OPEN;
+	static const String SAVE;
+	static const String RESET;
+	static const String NEW_PATCH;
 
 	//==============================================================================
 	static const String LOWPASS;
@@ -146,4 +163,26 @@ public:
 	static const String RELEASE;
 	static const String LEVEL;
 	static const String DEPTH;
+
+	//==============================================================================
+	static const String EQUALIZER;
+	static const String WAVESHAPER;
+	static const String REVERB;
+
+	//==============================================================================
+	static const String LOW_SHELF;
+	static const String BOOST;
+	static const String FREQUENCY;
+	static const String HIGH_SHELF;
+	static const String FAINT;
+	static const String LIGHT;
+	static const String MODERATE;
+	static const String HEAVY;
+	static const String HARSH;
+	static const String SHAPE;
+	static const String DRYWET;
+	static const String SIZE;
+	static const String DAMP;
+	static const String WIDTH;
+
 };

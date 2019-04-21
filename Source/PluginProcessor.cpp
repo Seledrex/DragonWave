@@ -279,6 +279,21 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 	params.push_back(std::move(carrierFilterEnvelopeLevel));
 
 	//==============================================================================
+	// Effect Params
+	//==============================================================================
+	auto effectType = std::make_unique<AudioParameterChoice>(
+		Constants::EFFECT_TYPE_ID,
+		Constants::EFFECT_TYPE_NAME,
+		StringArray(
+			Constants::EQUALIZER,
+			Constants::WAVESHAPER,
+			Constants::REVERB
+		),
+		0
+	);
+	params.push_back(std::move(effectType));
+
+	//==============================================================================
 	// Equalizer Params
 	//==============================================================================
 	auto eqLowShelf = std::make_unique<AudioParameterFloat>(
@@ -355,11 +370,11 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::WS_SHAPE_ID,
 		Constants::WS_SHAPE_NAME,
 		StringArray(
-			"Faint",
-			"Light",
-			"Moderate",
-			"Heavy",
-			"Harsh"
+			Constants::FAINT,
+			Constants::LIGHT,
+			Constants::MODERATE,
+			Constants::HEAVY,
+			Constants::HARSH
 		),
 		0
 	);
@@ -372,6 +387,40 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		0.0f
 	);
 	params.push_back(std::move(wsMix));
+
+	//==============================================================================
+	// Global Params
+	//==============================================================================
+	auto unison = std::make_unique<AudioParameterInt>(
+		Constants::UNISON_ID,
+		Constants::UNISON_NAME,
+		1, 8, 1
+	);
+	params.push_back(std::move(unison));
+
+	auto detune = std::make_unique<AudioParameterFloat>(
+		Constants::DETUNE_ID,
+		Constants::DETUNE_NAME,
+		NormalisableRange<float>(0.0f, 1.0f),
+		0.0f
+	);
+	params.push_back(std::move(detune));
+
+	auto spread = std::make_unique<AudioParameterFloat>(
+		Constants::SPREAD_ID,
+		Constants::SPREAD_NAME,
+		NormalisableRange<float>(0.0f, 1.0f),
+		0.0f
+	);
+	params.push_back(std::move(spread));
+
+	auto master = std::make_unique<AudioParameterFloat>(
+		Constants::MASTER_ID,
+		Constants::MASTER_NAME,
+		NormalisableRange<float>(0.0f, 2.0f, 0.001f, 0.5f),
+		1.0f
+	);
+	params.push_back(std::move(master));
 
 	return { params.begin(), params.end() };
 }

@@ -18,19 +18,19 @@ Menu::Menu(DragonWaveAudioProcessor& p) :
 	setSize(Constants::COMPONENT_WIDTH, Constants::COMPONENT_HEIGHT);
 
 	addAndMakeVisible(openButton);
-	openButton.setButtonText("Open...");
+	openButton.setButtonText(Constants::OPEN);
 	openButton.addListener(this);
 
 	addAndMakeVisible(saveButton);
-	saveButton.setButtonText("Save...");
+	saveButton.setButtonText(Constants::SAVE);
 	saveButton.addListener(this);
 
 	addAndMakeVisible(resetButton);
-	resetButton.setButtonText("Reset");
+	resetButton.setButtonText(Constants::RESET);
 	resetButton.addListener(this);
 
 	addAndMakeVisible(presetLabel);
-	presetLabel.setText("New Patch", dontSendNotification);
+	presetLabel.setText(Constants::RESET, dontSendNotification);
 	presetLabel.setJustificationType(Justification::centred);
 	presetLabel.setColour(0, Colours::white);
 }
@@ -57,7 +57,7 @@ void Menu::paint (Graphics& g)
 	g.setFont(g.getCurrentFont().italicised());
 	g.setFont(30);
 	g.setColour(Colours::white);
-	g.drawFittedText("Dragon Wave", titleArea, Justification::centred, 1);
+	g.drawFittedText(Constants::MENU_TITLE, titleArea, Justification::centred, 1);
 
 	// Draw border
 	g.setColour(Colours::white);

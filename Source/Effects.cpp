@@ -19,11 +19,10 @@ Effects::Effects(DragonWaveAudioProcessor& p)
 
 	int i = 0;
 	addAndMakeVisible(effectMenu);
-	effectMenu.addItem("Equalizer", ++i);
-	effectMenu.addItem("Waveshaper", ++i);
-	effectMenu.addItem("Reverb", ++i);
+	effectMenu.addItem(Constants::EQUALIZER, ++i);
+	effectMenu.addItem(Constants::WAVESHAPER, ++i);
+	effectMenu.addItem(Constants::REVERB, ++i);
 	effectMenu.setJustificationType(Justification::centredLeft);
-	effectMenu.setSelectedId(1, sendNotification);
 	effectMenu.addListener(this);
 
 	//==============================================================================
@@ -34,7 +33,7 @@ Effects::Effects(DragonWaveAudioProcessor& p)
 	lowShelfSlider.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
 
 	addAndMakeVisible(lowShelfLabel);
-	lowShelfLabel.setText("Low Shelf", dontSendNotification);
+	lowShelfLabel.setText(Constants::LOW_SHELF, dontSendNotification);
 	lowShelfLabel.setJustificationType(Justification::centred);
 
 	//==============================================================================
@@ -43,7 +42,7 @@ Effects::Effects(DragonWaveAudioProcessor& p)
 	boostSlider.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
 
 	addAndMakeVisible(boostLabel);
-	boostLabel.setText("Boost", dontSendNotification);
+	boostLabel.setText(Constants::BOOST, dontSendNotification);
 	boostLabel.setJustificationType(Justification::centred);
 
 	//==============================================================================
@@ -52,7 +51,7 @@ Effects::Effects(DragonWaveAudioProcessor& p)
 	frequencySlider.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
 
 	addAndMakeVisible(frequencyLabel);
-	frequencyLabel.setText("Frequency", dontSendNotification);
+	frequencyLabel.setText(Constants::FREQUENCY, dontSendNotification);
 	frequencyLabel.setJustificationType(Justification::centred);
 
 	//==============================================================================
@@ -61,7 +60,7 @@ Effects::Effects(DragonWaveAudioProcessor& p)
 	highShelfSlider.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
 
 	addAndMakeVisible(highShelfLabel);
-	highShelfLabel.setText("High Shelf", dontSendNotification);
+	highShelfLabel.setText(Constants::HIGH_SHELF, dontSendNotification);
 	highShelfLabel.setJustificationType(Justification::centred);
 
 	//==============================================================================
@@ -69,16 +68,15 @@ Effects::Effects(DragonWaveAudioProcessor& p)
 	//==============================================================================
 	i = 0;
 	addAndMakeVisible(waveshaperMenu);
-	waveshaperMenu.addItem("Faint", ++i);
-	waveshaperMenu.addItem("Light", ++i);
-	waveshaperMenu.addItem("Moderate", ++i);
-	waveshaperMenu.addItem("Heavy", ++i);
-	waveshaperMenu.addItem("Harsh", ++i);
+	waveshaperMenu.addItem(Constants::FAINT, ++i);
+	waveshaperMenu.addItem(Constants::LIGHT, ++i);
+	waveshaperMenu.addItem(Constants::MODERATE, ++i);
+	waveshaperMenu.addItem(Constants::HEAVY, ++i);
+	waveshaperMenu.addItem(Constants::HARSH, ++i);
 	waveshaperMenu.setJustificationType(Justification::centredLeft);
-	waveshaperMenu.setSelectedId(1, dontSendNotification);
 
 	addAndMakeVisible(waveshaperMenuLabel);
-	waveshaperMenuLabel.setText("Shape", dontSendNotification);
+	waveshaperMenuLabel.setText(Constants::SHAPE, dontSendNotification);
 	waveshaperMenuLabel.setJustificationType(Justification::centred);
 
 	//==============================================================================
@@ -87,7 +85,7 @@ Effects::Effects(DragonWaveAudioProcessor& p)
 	waveshaperMixSlider.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
 
 	addAndMakeVisible(waveshaperMixLabel);
-	waveshaperMixLabel.setText("Dry/Wet", dontSendNotification);
+	waveshaperMixLabel.setText(Constants::DRYWET, dontSendNotification);
 	waveshaperMixLabel.setJustificationType(Justification::centred);
 
 	//==============================================================================
@@ -98,7 +96,7 @@ Effects::Effects(DragonWaveAudioProcessor& p)
 	roomSizeSlider.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
 
 	addAndMakeVisible(roomSizeLabel);
-	roomSizeLabel.setText("Size", dontSendNotification);
+	roomSizeLabel.setText(Constants::SIZE, dontSendNotification);
 	roomSizeLabel.setJustificationType(Justification::centred);
 
 	//==============================================================================
@@ -107,7 +105,7 @@ Effects::Effects(DragonWaveAudioProcessor& p)
 	dampingSlider.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
 
 	addAndMakeVisible(dampingLabel);
-	dampingLabel.setText("Damp", dontSendNotification);
+	dampingLabel.setText(Constants::DAMP, dontSendNotification);
 	dampingLabel.setJustificationType(Justification::centred);
 
 	//==============================================================================
@@ -116,7 +114,7 @@ Effects::Effects(DragonWaveAudioProcessor& p)
 	widthSlider.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
 
 	addAndMakeVisible(widthLabel);
-	widthLabel.setText("Width", dontSendNotification);
+	widthLabel.setText(Constants::WIDTH, dontSendNotification);
 	widthLabel.setJustificationType(Justification::centred);
 
 	//==============================================================================
@@ -125,7 +123,7 @@ Effects::Effects(DragonWaveAudioProcessor& p)
 	reverbMixSlider.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
 
 	addAndMakeVisible(reverbMixLabel);
-	reverbMixLabel.setText("Dry/Wet", dontSendNotification);
+	reverbMixLabel.setText(Constants::DRYWET, dontSendNotification);
 	reverbMixLabel.setJustificationType(Justification::centred);
 
 	//==============================================================================
@@ -153,6 +151,9 @@ Effects::Effects(DragonWaveAudioProcessor& p)
 		processor.parameters, Constants::WS_SHAPE_ID, waveshaperMenu);
 	waveshaperMixAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(
 		processor.parameters, Constants::WS_MIX_ID, waveshaperMixSlider);
+
+	effectMenuAttach = std::make_unique<AudioProcessorValueTreeState::ComboBoxAttachment>(
+		processor.parameters, Constants::EFFECT_TYPE_ID, effectMenu);
 }
 
 Effects::~Effects()
@@ -175,7 +176,7 @@ void Effects::paint (Graphics& g)
 
 	// Draw title text
 	g.setColour(Colours::white);
-	g.drawText("Effects", titleArea, Justification::centred);
+	g.drawText(Constants::EFFECTS_TITLE, titleArea, Justification::centred);
 
 	// Draw border
 	g.setColour(Colours::white);

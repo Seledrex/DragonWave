@@ -56,4 +56,6 @@ private:
 	//==============================================================================
 	std::vector<float> sampleTransferFunction(std::function<float(float)> f);
 
+	//==============================================================================
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Waveshaper)
 };

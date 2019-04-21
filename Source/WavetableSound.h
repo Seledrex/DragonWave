@@ -31,5 +31,5 @@ public:
 	bool appliesToChannel(int) override;
 
 	//==============================================================================
-	JUCE_LEAK_DETECTOR(WavetableSound);
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WavetableSound);
 };

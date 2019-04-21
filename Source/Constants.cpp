@@ -69,6 +69,8 @@ const String Constants::FM_ENV_LEVEL_ID = "fmEnvLevel";
 const String Constants::FM_ENV_LEVEL_NAME = "FME Level";
 
 //==============================================================================
+const String Constants::EFFECT_TYPE_ID = "effectType";
+const String Constants::EFFECT_TYPE_NAME = "Effect Type";
 const String Constants::EQ_LOW_SHELF_ID = "eqLowShelf";
 const String Constants::EQ_LOW_SHELF_NAME = "EQ Low Shelf";
 const String Constants::EQ_BOOST_ID = "eqBoost";
@@ -91,6 +93,16 @@ const String Constants::REVERB_MIX_ID = "reverbMix";
 const String Constants::REVERB_MIX_NAME = "Reverb Dry/Wet";
 
 //==============================================================================
+const String Constants::UNISON_ID = "unison";
+const String Constants::UNISON_NAME = "Unison";
+const String Constants::DETUNE_ID = "detune";
+const String Constants::DETUNE_NAME = "Detune";
+const String Constants::SPREAD_ID = "spread";
+const String Constants::SPREAD_NAME = "Spread";
+const String Constants::MASTER_ID = "master";
+const String Constants::MASTER_NAME = "Master";
+
+//==============================================================================
 const int Constants::EDITOR_WIDTH = 900;
 const int Constants::EDITOR_HEIGHT = 700;
 const int Constants::COMPONENT_WIDTH = EDITOR_WIDTH / 3;
@@ -103,12 +115,13 @@ const String Constants::CARRIER_OSCILLATOR_TITLE = "Carrier Oscillator Settings"
 const String Constants::CARRIER_FILTER_TITLE = "Carrier Filter";
 const String Constants::CARRIER_ENV_TITLE = "Carrier Envelope";
 const String Constants::CARRIER_FILTER_ENV_TITLE = "Carrier Filter Envelope";
-
-//==============================================================================
 const String Constants::FM_OSCILLOSCOPE_TITLE = "FM Oscillator";
 const String Constants::FM_OSCILLATOR_TITLE = "FM Oscillator Settings";
 const String Constants::FM_FILTER_TITLE = "FM Filter";
 const String Constants::FM_ENV_TITLE = "FM Envelope";
+const String Constants::MENU_TITLE = "Dragon Wave";
+const String Constants::EFFECTS_TITLE = "Effects";
+const String Constants::GLOBAL_TITLE = "Global Settings";
 
 //==============================================================================
 const String Constants::SINE = "Sin";
@@ -120,6 +133,10 @@ const String Constants::NOISE = "Noise";
 //==============================================================================
 const String Constants::OPEN_WAVETABLE = "Open wavetable...";
 const String Constants::SELECT_WAVETABLE = "Select wavetable...";
+const String Constants::OPEN = "Open...";
+const String Constants::SAVE = "Save...";
+const String Constants::RESET = "Reset";
+const String Constants::NEW_PATCH = "New Patch";
 
 //==============================================================================
 const String Constants::LOWPASS = "Lowpass";
@@ -140,3 +157,24 @@ const String Constants::SUSTAIN = "Sustain";
 const String Constants::RELEASE = "Release";
 const String Constants::LEVEL = "Level";
 const String Constants::DEPTH = "Depth";
+
+//==============================================================================
+const String Constants::EQUALIZER = "Equalizer";
+const String Constants::WAVESHAPER = "Waveshaper";
+const String Constants::REVERB = "Reverb";
+
+//==============================================================================
+const String Constants::LOW_SHELF = "Low Shelf";
+const String Constants::BOOST = "Boost";
+const String Constants::FREQUENCY = "Frequency";
+const String Constants::HIGH_SHELF = "High Shelf";
+const String Constants::FAINT = "Faint";
+const String Constants::LIGHT = "Light";
+const String Constants::MODERATE = "Moderate";
+const String Constants::HEAVY = "Heavy";
+const String Constants::HARSH = "Harsh";
+const String Constants::SHAPE = "Shape";
+const String Constants::DRYWET = "Dry/Wet";
+const String Constants::SIZE = "Size";
+const String Constants::DAMP = "Damp";
+const String Constants::WIDTH = "Width";

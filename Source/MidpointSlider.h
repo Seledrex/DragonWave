@@ -22,5 +22,6 @@ public:
 		float minSliderPos,
 		float maxSliderPos,
 		const Slider::SliderStyle style, Slider& slider) override;
-	
+private:
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidpointSlider)
 };

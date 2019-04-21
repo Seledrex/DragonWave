@@ -19,6 +19,7 @@
 #include "Envelope.h"
 #include "Menu.h"
 #include "Effects.h"
+#include "Global.h"
 
 //==============================================================================
 /**
@@ -53,6 +54,7 @@ private:
 
 	Menu menuGUI;
 	Effects effectsGUI;
+	Global globalGUI;
 
 	//==============================================================================
 	void timerCallback() override;
