@@ -21,15 +21,15 @@ Waveshaper::Waveshaper() : currentTable(faintTable)
 	});
 
 	moderateTable = sampleTransferFunction([](float x) -> float {
-		return 1.01812944412f * std::tanh(3.0f * MathConstants<float>::pi / 4.0f * x);
+		return 1.0037418732f* std::tanh(MathConstants<float>::pi * x);
 	});
 
 	heavyTable = sampleTransferFunction([](float x) -> float {
-		return 1.0037418732f * std::tanh(MathConstants<float>::pi * x);
+		return 1.00016141207f* std::tanh(3.0f * MathConstants<float>::pi / 2.0f * x);
 	});
 
 	harshTable = sampleTransferFunction([](float x) -> float {
-		return 1.00016141207f * std::tanh(3.0f * MathConstants<float>::pi / 2.0f * x);
+		return 1.00000697471f * std::tanh(MathConstants<float>::twoPi * x);
 	});
 }
 
@@ -62,8 +62,7 @@ void Waveshaper::processMono(float* buffer, int numSamples)
 {
 	for (int i = 0; i < numSamples; i++)
 	{
-		int mappedValue = roundToInt(jmap(buffer[i], -1.0f, 1.0f, 0.0f, (float)size - 1.0f));
-		buffer[i] = currentTable[mappedValue] * wet + buffer[i] * dry;
+		buffer[i] = processSingleSample(buffer[i]);
 	}
 }
 
@@ -71,17 +70,24 @@ void Waveshaper::processStereo(float* leftChannel, float* rightChannel, int numS
 {
 	for (int i = 0; i < numSamples; i++)
 	{
-		int mappedValueLeft = roundToInt(jmap(leftChannel[i], -1.0f, 1.0f, 0.0f, (float)size - 1.0f));
-		int mappedValueRight = roundToInt(jmap(rightChannel[i], -1.0f, 1.0f, 0.0f, (float)size - 1.0f));
-		leftChannel[i] = currentTable[mappedValueLeft] * wet + leftChannel[i] * dry;
-		rightChannel[i] = currentTable[mappedValueRight] * wet + rightChannel[i] * dry;
+		leftChannel[i] = processSingleSample(leftChannel[i]);
+		rightChannel[i] = processSingleSample(rightChannel[i]);
 	}
 }
 
 float Waveshaper::processSingleSample(float sample)
 {
-	int mappedValue = roundToInt(jmap(sample, -1.0f, 1.0f, 0.0f, (float)size - 1.0f));
-	return currentTable[mappedValue] * wet + sample * dry;
+	float mappedValue = jmap(sample, -1.0f, 1.0f, 0.0f, (float)size - 1.0f);
+
+	auto indexBefore = (unsigned int)mappedValue;
+	auto indexAfter = indexBefore + 1;
+	auto frac = mappedValue - (float)indexBefore;
+
+	auto valueBefore = currentTable[indexBefore];
+	auto valueAfter = currentTable[indexAfter];
+	float currentSample = valueBefore + frac * (valueAfter - valueBefore);
+
+	return currentSample * wet + sample * dry;
 }
 
 std::vector<float> Waveshaper::sampleTransferFunction(std::function<float(float)> f)
