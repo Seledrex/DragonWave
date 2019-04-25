@@ -37,6 +37,8 @@ public:
 	void setFmFilterParams(float* newType, float* newCutoff, float* newQ);
 	void setFmEnvParams(float* newAttack, float* newDecay, float* newSustain, float* newRelease, float* newLevel);
 
+	void setGlobalParams(float* newUnison, float* newDetune, float* newSpread);
+
 private:
 
 	//==============================================================================
@@ -48,7 +50,7 @@ private:
 	float carrierFilterCutoff = 0.0f;
 	float carrierFilterType = 0.0f;
 	float carrierFilterQ = 0.0f;
-	
+
 	float fmFrequency = 0.0f;
 	float fmDepth = 0.0f;
 
@@ -56,16 +58,43 @@ private:
 	float fmEnvLevel = 0.0f;
 	float carrierFilterEnvLevel = 0.0f;
 
-	float currentCarrierIndex = 0.0f;
-	float carrierTableDelta = 0.0f;
 	float carrierWavetableMix = 0.0f;
-
-	float currentFmIndex = 0.0f;
-	float fmTableDelta = 0.0f;
 	float fmWavetableMix = 0.0f;
+
+	float fmAttack = 0.0f;
+	float fmDecay = 0.0f;
+	float fmSustain = 0.0f;
+	float fmRelease = 0.0f;
+
+	//==============================================================================
+	int currentUnison = 1;
+	int previousUnison = 0;
+
+	float detune = 0.0f;
+	float spread = 0.0f;
+
+	std::vector<float> carrierIndices;
+	std::vector<float> carrierDeltas;
+	std::vector<float> fmIndices;
+	std::vector<float> fmDeltas;
+
+	std::vector<float> detuneAmounts;
+	std::vector<float> spreadAmounts;
+
+	OwnedArray<IIRFilter> fmFilters;
+	OwnedArray<ADSR> fmEnvelopes;
+
+	IIRFilter carrierFilterL;
+	IIRFilter carrierFilterR;
+
+	int fmFilterType = 0;
+	float fmFilterCutoff = 0.0f;
+	float fmFilterQ = 0.0f;
 
 	//==============================================================================
 	WavetableSound* ws = nullptr;
+	ReferenceCountedWavetable::Ptr carrierPtr;
+	ReferenceCountedWavetable::Ptr fmPtr;
 	Wavetable* carrier = nullptr;
 	Wavetable* fm = nullptr;
 
@@ -78,7 +107,6 @@ private:
 	IIRFilter carrierFilter;
 	IIRFilter fmFilter;
 	ADSR carrierEnvelope;
-	ADSR fmEnvelope;
 	ADSR carrierFilterEnvelope;
 
 	//==============================================================================
@@ -87,9 +115,7 @@ private:
 	float filterCutoffUpperBound = 0.0f;
 	float filterCutoffDirection = 1.0f;
 
-	//==============================================================================
-	forcedinline float getNextSample() noexcept;
-	forcedinline void modulateFrequency() noexcept;
+	void setFilterParams(IIRFilter* filter, int type, float cutoff, float q);
 
 	//==============================================================================
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WavetableVoice);

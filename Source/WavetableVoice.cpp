@@ -13,6 +13,7 @@
 
 WavetableVoice::WavetableVoice()
 {
+	carrierDeltas = std::vector<float>(1, 0.0f);
 }
 
 bool WavetableVoice::canPlaySound(SynthesiserSound* sound)
@@ -31,8 +32,11 @@ void WavetableVoice::startNote(
 
 	// Get the wavetable information
 	ws = dynamic_cast<WavetableSound*>(sound);
-	carrier = ws->carrier->getWavetable();
-	fm = ws->fm->getWavetable();
+	carrierPtr = ReferenceCountedWavetable::Ptr(ws->carrier);
+	fmPtr = ReferenceCountedWavetable::Ptr(ws->fm);
+
+	carrier = carrierPtr->getWavetable();
+	fm = fmPtr->getWavetable();
 
 	// Set wavetable size
 	wavetableSize = carrier->getWavetableSize();
@@ -46,13 +50,29 @@ void WavetableVoice::startNote(
 	// Set level based off velocity
 	level = velocity * 0.15f;
 
-	// Set carrier oscillator wavetable index and delta
-	currentCarrierIndex = 0.0f;
-	carrierTableDelta = frequency * wavetableSize / (float)getSampleRate();
+	// Set unison
+	carrierIndices = std::vector<float>(currentUnison, 0.0f);
+	carrierDeltas = std::vector<float>(currentUnison, 0.0f);
+	fmIndices = std::vector<float>(currentUnison, 0.0f);
+	fmDeltas = std::vector<float>(currentUnison, 0.0f);
 
-	// Set FM oscillator wavetable index and delta
-	currentFmIndex = 0.0f;
-	fmTableDelta = frequency * wavetableSize / (float)getSampleRate();
+	// Set detune and spread amounts
+	if (currentUnison == 1)
+	{
+		detuneAmounts = std::vector<float>(1, 0.0f);
+		spreadAmounts = std::vector<float>(1, 0.0f);
+	}
+	else
+	{
+		detuneAmounts = Util::linspace(-detune, detune, currentUnison);
+		spreadAmounts = Util::linspace(-1.0f, 1.0f, currentUnison);
+	}
+
+	// Set wavetable index and delta
+	for (int i = 0; i < currentUnison; i++) {
+		carrierDeltas[i] = (frequency + (frequency * detuneAmounts[i])) * wavetableSize / (float)getSampleRate();
+		fmDeltas[i] = (frequency + (frequency * detuneAmounts[i])) * wavetableSize / (float)getSampleRate();
+	}
 
 	// Calculate carrier oscillator mixing proportions
 	if (carrierBFs.first != carrierBFs.second)
@@ -66,16 +86,36 @@ void WavetableVoice::startNote(
 	else
 		fmWavetableMix = 1;
 
+	// Setup FM filters
+	fmFilters.clearQuick(true);
+	for (int i = 0; i < currentUnison; i++)
+	{
+		IIRFilter* filter = new IIRFilter();
+		setFilterParams(filter, fmFilterType, fmFilterCutoff, fmFilterQ);
+		fmFilters.add(filter);
+	}
+
 	// Start attack phase
 	carrierEnvelope.noteOn();
-	fmEnvelope.noteOn();
 	carrierFilterEnvelope.noteOn();
+
+	fmEnvelopes.clearQuick(true);
+	for (int i = 0; i < currentUnison; i++)
+	{
+		ADSR* fmEnv = new ADSR();
+		fmEnv->setSampleRate(getSampleRate());
+		fmEnv->setParameters({ fmAttack, fmDecay, fmSustain, fmRelease });
+		fmEnv->noteOn();
+		fmEnvelopes.add(fmEnv);
+	}
+
+	previousUnison = currentUnison;
 }
 
-void WavetableVoice::renderNextBlock(AudioSampleBuffer & outputBuffer, int startSample, int numSamples)
+void WavetableVoice::renderNextBlock(AudioSampleBuffer& outputBuffer, int startSample, int numSamples)
 {
 	// Make sure we have a note to play
-	if (carrierTableDelta != 0)
+	if (carrierDeltas[0] != 0.0f)
 	{
 		if (carrier->getWaveformType() == Wavetable::Waveform::Noise)
 		{
@@ -92,39 +132,161 @@ void WavetableVoice::renderNextBlock(AudioSampleBuffer & outputBuffer, int start
 		}
 		else
 		{
-			while (--numSamples >= 0)
+			float currentFmSample = 0.0f;
+			float currentCarrierSample = 0.0f;
+			float gainFactor = 1.0f / (float)carrierDeltas.size();
+
+			AudioSampleBuffer currentBuffer;
+			currentBuffer.setSize(2, numSamples);
+			currentBuffer.clear();
+
+			for (int i = 0; i < previousUnison; i++)
 			{
-				// Modulate carrier frequency
-				modulateFrequency();
+				int currentNumSamples = numSamples;
+				int currentStartSample = startSample;
 
-				// Get next envelope value
-				auto currentEnv = carrierEnvelope.getNextSample() * carrierEnvLevel;
+				for (int s = 0; s < numSamples; s++)
+				{
+					//==============================================================================
+					// Modulate carrier frequency
+					//==============================================================================
 
-				// Calculate current sample
-				auto currentSample = getNextSample() * currentEnv * level;
-				
-				// Place sample into output buffer
-				for (auto i = 0; i < outputBuffer.getNumChannels(); i++)
-					outputBuffer.addSample(i, startSample, currentSample);
+					float currentFmEnv = fmEnvelopes.getUnchecked(i)->getNextSample() * fmEnvLevel;
+
+					// Get the indexes that surround the current index estimate
+					auto indexBefore = (unsigned int)fmIndices[i];
+					auto indexAfter = indexBefore + 1;
+
+					// Find the fraction of how far current sample is towards the next
+					auto frac = fmIndices[i] - (float)indexBefore;
+
+					// Get next sample on lower wavetable
+					auto* fmTableLo = fm->getWavetables().getReadPointer(fmBIs.first);
+					auto valueBeforeLo = fmTableLo[indexBefore];
+					auto valueAfterLo = fmTableLo[indexAfter];
+					float currentSampleLo = valueBeforeLo + frac * (valueAfterLo - valueBeforeLo);
+
+					// Get next sample on higher wavetable
+					auto* fmTableHi = fm->getWavetables().getReadPointer(fmBIs.second);
+					auto valueBeforeHi = fmTableHi[indexBefore];
+					auto valueAfterHi = fmTableHi[indexAfter];
+					float currentSampleHi = valueBeforeHi + frac * (valueAfterHi - valueBeforeHi);
+
+					// Increment phase change and prevent overflow
+					fmIndices[i] += fmDeltas[i];
+					fmIndices[i] = std::fmod(fmIndices[i], (float)wavetableSize);
+
+					// Mix samples from both wavetables
+					currentFmSample = currentSampleLo * (1.0f - fmWavetableMix) + currentSampleHi * fmWavetableMix;
+					currentFmSample = fmFilters.getUnchecked(i)->processSingleSampleRaw(currentFmSample);
+					currentFmSample *= currentFmEnv;
+
+					// Calculate new frequency
+					float newFrequency = std::abs(frequency + (frequency * detuneAmounts[i]) + currentFmSample * fmDepth);
+					carrierDeltas[i] = newFrequency * wavetableSize / (float)getSampleRate();
+
+					//==============================================================================
+					// Calculate current sample
+					//==============================================================================
+
+					// Get the indexes that surround the current index estimate
+					indexBefore = (unsigned int)carrierIndices[i];
+					indexAfter = indexBefore + 1;
+
+					// Find the fraction of how far current sample is towards the next
+					frac = carrierIndices[i] - (float)indexBefore;
+
+					// Get next sample on lower wavetable
+					auto* carrierTableLo = carrier->getWavetables().getReadPointer(carrierBIs.first);
+					valueBeforeLo = carrierTableLo[indexBefore];
+					valueAfterLo = carrierTableLo[indexAfter];
+					currentSampleLo = valueBeforeLo + frac * (valueAfterLo - valueBeforeLo);
+
+					// Get next sample on higher wavetable
+					auto* carrierTableHi = carrier->getWavetables().getReadPointer(carrierBIs.second);
+					valueBeforeHi = carrierTableHi[indexBefore];
+					valueAfterHi = carrierTableHi[indexAfter];
+					currentSampleHi = valueBeforeHi + frac * (valueAfterHi - valueBeforeHi);
+
+					// Increment phase change and prevent overflow
+					carrierIndices[i] += carrierDeltas[i];
+					carrierIndices[i] = std::fmod(carrierIndices[i], (float)wavetableSize);
+
+					// Mix samples from both wavetables 
+					currentCarrierSample = currentSampleLo * (1.0f - carrierWavetableMix) + currentSampleHi * carrierWavetableMix;
+					currentCarrierSample *= gainFactor;
+
+					//==============================================================================
+					// Mix down and spread
+					//==============================================================================
+
+					float leftSample = currentCarrierSample + (gainFactor * spreadAmounts[i] * spread);
+					float rightSample = currentCarrierSample - (gainFactor * spreadAmounts[i] * spread);
+
+					currentBuffer.addSample(0, s, leftSample);
+					currentBuffer.addSample(1, s, rightSample);
+
+					currentStartSample++;
+				}
+			}
+
+			auto currentEnv = 0.0f;
+
+			for (int s = 0; s < numSamples; s++)
+			{
+				//==============================================================================
+				// Filter
+				//==============================================================================
+
+				float currentFilterEnvSample = carrierFilterEnvelope.getNextSample();
+				float newCutoff = jmap(
+					filterCutoffDirection == -1.0f ? 1 - currentFilterEnvSample : currentFilterEnvSample,
+					filterCutoffLowerBound,
+					filterCutoffUpperBound
+				);
+
+				setCarrierFilterParams(carrierFilterType, newCutoff, carrierFilterQ);
+				float leftSample = carrierFilterL.processSingleSampleRaw(currentBuffer.getSample(0, s));
+				float rightSample = carrierFilterR.processSingleSampleRaw(currentBuffer.getSample(1, s));
+
+				//==============================================================================
+				// Envelope
+				//==============================================================================
+
+				currentEnv = carrierEnvelope.getNextSample() * carrierEnvLevel;
+				leftSample *= currentEnv * level;
+				rightSample *= currentEnv * level;
+
+				outputBuffer.addSample(0, startSample, leftSample);
+				outputBuffer.addSample(1, startSample, rightSample);
 
 				startSample++;
 			}
+
+			if (currentEnv < 0.001f)
+				clearCurrentNote();
 		}
 	}
 }
 
+//==============================================================================
 void WavetableVoice::stopNote(float /*velocity*/, bool allowTailOff)
 {
 	if (allowTailOff)
 	{
 		carrierEnvelope.noteOff();
-		fmEnvelope.noteOff();
 		carrierFilterEnvelope.noteOff();
+
+		for (int i = 0; i < previousUnison; i++)
+		{
+			fmEnvelopes.getUnchecked(i)->noteOff();
+		}
 	}
 	else
 	{
 		clearCurrentNote();
-		carrierTableDelta = 0;
+		for (int i = 0; i < previousUnison; i++)
+			carrierDeltas[i] = 0.0f;
 	}
 }
 
@@ -136,9 +298,10 @@ void WavetableVoice::controllerMoved(int /*controllerNumber*/, int /*newControll
 {
 }
 
+//==============================================================================
 void WavetableVoice::setCarrierPitchShift(float* shift)
 {
-	pitchShift = (int)*shift;
+	pitchShift = (int)* shift;
 }
 
 void WavetableVoice::setCarrierFilterParams(float newType, float newCutoff, float newQ)
@@ -147,44 +310,8 @@ void WavetableVoice::setCarrierFilterParams(float newType, float newCutoff, floa
 	carrierFilterCutoff = newCutoff;
 	carrierFilterQ = newQ;
 
-	switch ((int)carrierFilterType)
-	{
-	case 0:
-		carrierFilter.setCoefficients(IIRCoefficients::makeLowPass(
-			getSampleRate(),
-			(double)carrierFilterCutoff,
-			(double)carrierFilterQ));
-		break;
-	case 1:
-		carrierFilter.setCoefficients(IIRCoefficients::makeHighPass(
-			getSampleRate(),
-			(double)carrierFilterCutoff,
-			(double)carrierFilterQ));
-		break;
-	case 2:
-		carrierFilter.setCoefficients(IIRCoefficients::makeBandPass(
-			getSampleRate(),
-			(double)carrierFilterCutoff,
-			(double)carrierFilterQ));
-		break;
-	case 3:
-		carrierFilter.setCoefficients(IIRCoefficients::makeNotchFilter(
-			getSampleRate(),
-			(double)carrierFilterCutoff,
-			(double)carrierFilterQ));
-		break;
-	case 4:
-		carrierFilter.setCoefficients(IIRCoefficients::makeAllPass(
-			getSampleRate(),
-			(double)carrierFilterCutoff,
-			(double)carrierFilterQ));
-		break;
-	default:
-		carrierFilter.setCoefficients(IIRCoefficients::makeLowPass(
-			getSampleRate(),
-			(double)carrierFilterCutoff,
-			(double)carrierFilterQ));
-	}
+	setFilterParams(&carrierFilterL, carrierFilterType, carrierFilterCutoff, carrierFilterQ);
+	setFilterParams(&carrierFilterR, carrierFilterType, carrierFilterCutoff, carrierFilterQ);
 }
 
 void WavetableVoice::setCarrierEnvParams(float* newAttack, float* newDecay, float* newSustain, float* newRelease, float* newLevel)
@@ -214,127 +341,86 @@ void WavetableVoice::setCarrierFilterEnvParams(float* newAttack, float* newDecay
 	}
 }
 
+//==============================================================================
 void WavetableVoice::setFmOscParams(float* newFrequency, float* newDepth)
 {
 	// Update frequency modulation phase change
-	float newFmFrequency = frequency * jmap(*newFrequency, 0.125f, 3.0f);
-	fmTableDelta = newFmFrequency * wavetableSize / (float)getSampleRate();
+	fmFrequency = frequency * jmap(*newFrequency, 0.125f, 3.0f);
+
+	for (int i = 0; i < previousUnison; i++)
+		fmDeltas[i] = (fmFrequency + (fmFrequency * detuneAmounts[i])) * wavetableSize / (float)getSampleRate();
 
 	// Update frequency modulation depth
 	if (frequency > 0.0f)
 		fmDepth = jmap(*newDepth, 0.0f, frequency);
 	else
 		fmDepth = 0.0f;
-	
 }
 
 void WavetableVoice::setFmFilterParams(float* newType, float* newCutoff, float* newQ)
 {
-	int fmFilterType = (int)* newType;
-	double fmFilterCutoff = (double)* newCutoff;
-	double fmFilterQ = (double)* newQ;
+	fmFilterType = (int)* newType;
+	fmFilterCutoff = (double)* newCutoff;
+	fmFilterQ = (double)* newQ;
 
-	switch (fmFilterType)
-	{
-	case 0:
-		fmFilter.setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), fmFilterCutoff, fmFilterQ));
-		break;
-	case 1:
-		fmFilter.setCoefficients(IIRCoefficients::makeHighPass(getSampleRate(), fmFilterCutoff, fmFilterQ));
-		break;
-	case 2:
-		fmFilter.setCoefficients(IIRCoefficients::makeBandPass(getSampleRate(), fmFilterCutoff, fmFilterQ));
-		break;
-	case 3:
-		fmFilter.setCoefficients(IIRCoefficients::makeNotchFilter(getSampleRate(), fmFilterCutoff, fmFilterQ));
-		break;
-	case 4:
-		fmFilter.setCoefficients(IIRCoefficients::makeAllPass(getSampleRate(), fmFilterCutoff, fmFilterQ));
-		break;
-	default:
-		fmFilter.setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), fmFilterCutoff, fmFilterQ));
-	}
+	for (int i = 0; i < previousUnison; i++)
+		setFilterParams(fmFilters.getUnchecked(i), fmFilterType, fmFilterCutoff, fmFilterQ);
 }
 
 void WavetableVoice::setFmEnvParams(float* newAttack, float* newDecay, float* newSustain, float* newRelease, float* newLevel)
 {
-	fmEnvelope.setSampleRate(getSampleRate());
-	fmEnvelope.setParameters({ *newAttack, *newDecay, *newSustain, *newRelease });
-	fmEnvLevel = *newLevel;
+	fmAttack = *newAttack;
+	fmDecay = *newDecay;
+	fmSustain = *newSustain;
+	fmRelease = *newRelease;
+
+	for (int i = 0; i < previousUnison; i++)
+	{
+		fmEnvelopes.getUnchecked(i)->setSampleRate(getSampleRate());
+		fmEnvelopes.getUnchecked(i)->setParameters({ fmAttack, fmDecay, fmSustain, fmRelease });
+		fmEnvLevel = *newLevel;
+	}
 }
 
-forcedinline float WavetableVoice::getNextSample() noexcept
+//==============================================================================
+void WavetableVoice::setGlobalParams(float* newUnison, float* newDetune, float* newSpread)
 {
-	// Get the indexes that surround the current index estimate
-	auto indexBefore = (unsigned int)currentCarrierIndex;
-	auto indexAfter = indexBefore + 1;
+	currentUnison = (int)* newUnison;
+	detune = *newDetune;
+	spread = *newSpread;
 
-	// Find the fraction of how far current sample is towards the next
-	auto frac = currentCarrierIndex - (float)indexBefore;
+	if (previousUnison != 1)
+		detuneAmounts = Util::linspace(-detune, detune, previousUnison);
 
-	// Get next sample on lower wavetable
-	auto* tableLo = carrier->getWavetables().getReadPointer(carrierBIs.first);
-	auto valueBeforeLo = tableLo[indexBefore];
-	auto valueAfterLo = tableLo[indexAfter];
-	float currentSampleLo = valueBeforeLo + frac * (valueAfterLo - valueBeforeLo);
-
-	// Get next sample on higher wavetable
-	auto * tableHi = carrier->getWavetables().getReadPointer(carrierBIs.second);
-	auto valueBeforeHi = tableHi[indexBefore];
-	auto valueAfterHi = tableHi[indexAfter];
-	float currentSampleHi = valueBeforeHi + frac * (valueAfterHi - valueBeforeHi);
-
-	// Increment phase change and prevent overflow
-	currentCarrierIndex += carrierTableDelta;
-	currentCarrierIndex = std::fmod(currentCarrierIndex, (float)wavetableSize);
-
-	// Mix samples from both wavetables
-	auto currentSample = currentSampleLo * (1.0f - carrierWavetableMix) + currentSampleHi * carrierWavetableMix;
-
-	// Apply filter
-	float currentFilterEnvSample = carrierFilterEnvelope.getNextSample();
-	float newCutoff = jmap(filterCutoffDirection == -1.0f ? 1 - currentFilterEnvSample : currentFilterEnvSample, filterCutoffLowerBound, filterCutoffUpperBound);
-
-	setCarrierFilterParams(carrierFilterType, newCutoff, carrierFilterQ);
-	currentSample = carrierFilter.processSingleSampleRaw(currentSample);
-
-	return currentSample;
+	for (int i = 0; i < previousUnison; i++)
+	{
+		fmDeltas[i] = (fmFrequency + (fmFrequency * detuneAmounts[i])) * wavetableSize / (float)getSampleRate();
+		carrierDeltas[i] = (frequency + (frequency * detuneAmounts[i])) * wavetableSize / (float)getSampleRate();
+	}
 }
 
-forcedinline void WavetableVoice::modulateFrequency() noexcept
+//==============================================================================
+void WavetableVoice::setFilterParams(IIRFilter * filter, int type, float cutoff, float q)
 {
-	// Get the indexes that surround the current index estimate
-	auto indexBefore = (unsigned int)currentFmIndex;
-	auto indexAfter = indexBefore + 1;
-
-	// Find the fraction of how far current sample is towards the next
-	auto frac = currentFmIndex - (float)indexBefore;
-
-	// Get next sample on lower wavetable
-	auto* tableLo = fm->getWavetables().getReadPointer(fmBIs.first);
-	auto valueBeforeLo = tableLo[indexBefore];
-	auto valueAfterLo = tableLo[indexAfter];
-	float currentSampleLo = valueBeforeLo + frac * (valueAfterLo - valueBeforeLo);
-
-	// Get next sample on higher wavetable
-	auto * tableHi = fm->getWavetables().getReadPointer(fmBIs.second);
-	auto valueBeforeHi = tableHi[indexBefore];
-	auto valueAfterHi = tableHi[indexAfter];
-	float currentSampleHi = valueBeforeHi + frac * (valueAfterHi - valueBeforeHi);
-
-	// Increment phase change and prevent overflow
-	currentFmIndex += fmTableDelta;
-	currentFmIndex = std::fmod(currentFmIndex, (float)wavetableSize);
-
-	// Mix samples from both wavetables
-	auto currentSample = currentSampleLo * (1.0f - fmWavetableMix) + currentSampleHi * fmWavetableMix;
-	currentSample = fmFilter.processSingleSampleRaw(currentSample);
-
-	// Apply envelope
-	float currentFmEnv = fmEnvelope.getNextSample() * fmEnvLevel;
-	currentSample *= currentFmEnv;
-
-	// Calculate new frequency
-	float newFrequency = std::abs(frequency + currentSample * fmDepth);
-	carrierTableDelta = newFrequency * wavetableSize / (float)getSampleRate();
+	switch (type)
+	{
+	case 0:
+		filter->setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), (double)cutoff, (double)q));
+		break;
+	case 1:
+		filter->setCoefficients(IIRCoefficients::makeHighPass(getSampleRate(), (double)cutoff, (double)q));
+		break;
+	case 2:
+		filter->setCoefficients(IIRCoefficients::makeBandPass(getSampleRate(), (double)cutoff, (double)q));
+		break;
+	case 3:
+		filter->setCoefficients(IIRCoefficients::makeNotchFilter(getSampleRate(), (double)cutoff, (double)q));
+		break;
+	case 4:
+		filter->setCoefficients(IIRCoefficients::makeAllPass(getSampleRate(), (double)cutoff, (double)q));
+		break;
+	default:
+		filter->setCoefficients(IIRCoefficients::makeLowPass(getSampleRate(), (double)cutoff, (double)q));
+	}
 }
+

@@ -28,7 +28,7 @@ DragonWaveAudioProcessor::DragonWaveAudioProcessor()
 #endif
 {
 	// Add voices to the synth
-	int numVoices = (int)*parameters.getRawParameterValue(Constants::CARRIER_OSC_VOICES_ID);
+	int numVoices = (int)* parameters.getRawParameterValue(Constants::CARRIER_OSC_VOICES_ID);
 	for (auto i = 0; i < numVoices; i++) {
 		synth.addVoice(new WavetableVoice());
 	}
@@ -54,14 +54,14 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::CARRIER_OSC_PITCH_ID,
 		Constants::CARRIER_OSC_PITCH_NAME,
 		-24, 24, 0
-	);
+		);
 	params.push_back(std::move(carrierOscPitch));
 
 	auto carrierOscVoices = std::make_unique<AudioParameterInt>(
 		Constants::CARRIER_OSC_VOICES_ID,
 		Constants::CARRIER_OSC_VOICES_NAME,
 		1, 32, 8
-	);
+		);
 	params.push_back(std::move(carrierOscVoices));
 
 	//==============================================================================
@@ -78,7 +78,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 			Constants::ALLPASS
 		),
 		0
-	);
+		);
 	params.push_back(std::move(carrierFilterType));
 
 	auto carrierFilterCutoff = std::make_unique<AudioParameterFloat>(
@@ -86,7 +86,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::CARRIER_FILTER_CUTOFF_NAME,
 		NormalisableRange<float>(20.0f, 20000.0f, 0.01f, 0.5f),
 		20000.0f
-	);
+		);
 	params.push_back(std::move(carrierFilterCutoff));
 
 	auto carrierFilterQ = std::make_unique<AudioParameterFloat>(
@@ -94,7 +94,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::CARRIER_FILTER_Q_NAME,
 		NormalisableRange<float>(0.5f, 10.0f),
 		1.0f
-	);
+		);
 	params.push_back(std::move(carrierFilterQ));
 
 	//==============================================================================
@@ -105,7 +105,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::CARRIER_ENV_ATTACK_NAME,
 		NormalisableRange<float>(0.001f, 5.0f, 0.001f, 0.5f),
 		0.001f
-	);
+		);
 	params.push_back(std::move(carrierEnvelopeAttack));
 
 	auto carrierEnvelopeDecay = std::make_unique<AudioParameterFloat>(
@@ -113,7 +113,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::CARRIER_ENV_DECAY_NAME,
 		NormalisableRange<float>(0.001f, 5.0f, 0.001f, 0.5f),
 		0.001f
-	);
+		);
 	params.push_back(std::move(carrierEnvelopeDecay));
 
 	auto carrierEnvelopeSustain = std::make_unique<AudioParameterFloat>(
@@ -121,7 +121,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::CARRIER_ENV_SUSTAIN_NAME,
 		NormalisableRange<float>(0.0f, 1.0f, 0.001f, 0.5f),
 		1.0f
-	);
+		);
 	params.push_back(std::move(carrierEnvelopeSustain));
 
 	auto carrierEnvelopeRelease = std::make_unique<AudioParameterFloat>(
@@ -129,7 +129,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::CARRIER_ENV_RELEASE_NAME,
 		NormalisableRange<float>(0.001f, 5.0f, 0.001f, 0.5f),
 		0.001f
-	);
+		);
 	params.push_back(std::move(carrierEnvelopeRelease));
 
 	auto carrierEnvelopeLevel = std::make_unique<AudioParameterFloat>(
@@ -137,7 +137,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::CARRIER_ENV_LEVEL_NAME,
 		NormalisableRange<float>(0.0f, 1.0f, 0.001f, 0.5f),
 		1.0f
-	);
+		);
 	params.push_back(std::move(carrierEnvelopeLevel));
 
 	//==============================================================================
@@ -148,7 +148,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::FM_OSC_FREQUENCY_NAME,
 		NormalisableRange<float>(0.0f, 1.0f, 0.0001f, 0.5f),
 		0.5f
-	);
+		);
 	params.push_back(std::move(fmOscFrequency));
 
 	auto fmOscDepth = std::make_unique<AudioParameterFloat>(
@@ -156,7 +156,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::FM_OSC_DEPTH_NAME,
 		NormalisableRange<float>(0.0f, 1.0f, 0.0001f, 0.5f),
 		0.0f
-	);
+		);
 	params.push_back(std::move(fmOscDepth));
 
 	//==============================================================================
@@ -173,7 +173,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 			Constants::ALLPASS
 		),
 		0
-	);
+		);
 	params.push_back(std::move(fmFilterType));
 
 	auto fmFilterCutoff = std::make_unique<AudioParameterFloat>(
@@ -181,7 +181,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::FM_FILTER_CUTOFF_NAME,
 		NormalisableRange<float>(20.0f, 20000.0f, 0.01f, 0.5f),
 		20000.0f
-	);
+		);
 	params.push_back(std::move(fmFilterCutoff));
 
 	auto fmFilterQ = std::make_unique<AudioParameterFloat>(
@@ -189,7 +189,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::FM_FILTER_Q_NAME,
 		NormalisableRange<float>(0.5f, 10.0f),
 		1.0f
-	);
+		);
 	params.push_back(std::move(fmFilterQ));
 
 	//==============================================================================
@@ -200,7 +200,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::FM_ENV_ATTACK_NAME,
 		NormalisableRange<float>(0.001f, 5.0f, 0.001f, 0.5f),
 		0.001f
-	);
+		);
 	params.push_back(std::move(fmEnvelopeAttack));
 
 	auto fmEnvelopeDecay = std::make_unique<AudioParameterFloat>(
@@ -208,7 +208,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::FM_ENV_DECAY_NAME,
 		NormalisableRange<float>(0.001f, 5.0f, 0.001f, 0.5f),
 		0.001f
-	);
+		);
 	params.push_back(std::move(fmEnvelopeDecay));
 
 	auto fmEnvelopeSustain = std::make_unique<AudioParameterFloat>(
@@ -216,7 +216,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::FM_ENV_SUSTAIN_NAME,
 		NormalisableRange<float>(0.0f, 1.0f, 0.001f, 0.5f),
 		1.0f
-	);
+		);
 	params.push_back(std::move(fmEnvelopeSustain));
 
 	auto fmEnvelopeRelease = std::make_unique<AudioParameterFloat>(
@@ -224,7 +224,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::FM_ENV_RELEASE_NAME,
 		NormalisableRange<float>(0.001f, 5.0f, 0.001f, 0.5f),
 		0.001f
-	);
+		);
 	params.push_back(std::move(fmEnvelopeRelease));
 
 	auto fmEnvelopeLevel = std::make_unique<AudioParameterFloat>(
@@ -232,7 +232,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::FM_ENV_LEVEL_NAME,
 		NormalisableRange<float>(0.0f, 1.0f, 0.001f, 0.5f),
 		1.0f
-	);
+		);
 	params.push_back(std::move(fmEnvelopeLevel));
 
 	//==============================================================================
@@ -243,7 +243,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::CARRIER_FILTER_ENV_ATTACK_NAME,
 		NormalisableRange<float>(0.001f, 5.0f, 0.001f, 0.5f),
 		0.001f
-	);
+		);
 	params.push_back(std::move(carrierFilterEnvelopeAttack));
 
 	auto carrierFilterEnvelopeDecay = std::make_unique<AudioParameterFloat>(
@@ -251,7 +251,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::CARRIER_FILTER_ENV_DECAY_NAME,
 		NormalisableRange<float>(0.001f, 5.0f, 0.001f, 0.5f),
 		0.001f
-	);
+		);
 	params.push_back(std::move(carrierFilterEnvelopeDecay));
 
 	auto carrierFilterEnvelopeSustain = std::make_unique<AudioParameterFloat>(
@@ -259,7 +259,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::CARRIER_FILTER_ENV_SUSTAIN_NAME,
 		NormalisableRange<float>(0.0f, 1.0f, 0.001f, 0.5f),
 		1.0f
-	);
+		);
 	params.push_back(std::move(carrierFilterEnvelopeSustain));
 
 	auto carrierFilterEnvelopeRelease = std::make_unique<AudioParameterFloat>(
@@ -267,7 +267,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::CARRIER_FILTER_ENV_RELEASE_NAME,
 		NormalisableRange<float>(0.001f, 5.0f, 0.001f, 0.5f),
 		0.001f
-	);
+		);
 	params.push_back(std::move(carrierFilterEnvelopeRelease));
 
 	auto carrierFilterEnvelopeLevel = std::make_unique<AudioParameterFloat>(
@@ -275,7 +275,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::CARRIER_FILTER_ENV_LEVEL_NAME,
 		NormalisableRange<float>(-1.0f, 1.0f, 0.001f, 0.4f, true),
 		0.0f
-	);
+		);
 	params.push_back(std::move(carrierFilterEnvelopeLevel));
 
 	//==============================================================================
@@ -290,7 +290,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 			Constants::REVERB
 		),
 		0
-	);
+		);
 	params.push_back(std::move(effectType));
 
 	//==============================================================================
@@ -301,7 +301,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::EQ_LOW_SHELF_NAME,
 		NormalisableRange<float>(0.1f, 1.9f),
 		1.0f
-	);
+		);
 	params.push_back(std::move(eqLowShelf));
 
 	auto eqBoost = std::make_unique<AudioParameterFloat>(
@@ -309,7 +309,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::EQ_BOOST_NAME,
 		NormalisableRange<float>(0.1f, 1.9f),
 		1.0f
-	);
+		);
 	params.push_back(std::move(eqBoost));
 
 	auto eqFrequency = std::make_unique<AudioParameterFloat>(
@@ -317,7 +317,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::EQ_FREQUENCY_NAME,
 		NormalisableRange<float>(250.0f, 2000.0f, 0.001f, 0.6f),
 		800.0f
-	);
+		);
 	params.push_back(std::move(eqFrequency));
 
 	auto eqHighShelf = std::make_unique<AudioParameterFloat>(
@@ -325,7 +325,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::EQ_HIGH_SHELF_NAME,
 		NormalisableRange<float>(0.1f, 1.9f),
 		1.0f
-	);
+		);
 	params.push_back(std::move(eqHighShelf));
 
 	//==============================================================================
@@ -336,7 +336,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::REVERB_SIZE_NAME,
 		NormalisableRange<float>(0.0f, 1.0f),
 		0.0f
-	);
+		);
 	params.push_back(std::move(reverbSize));
 
 	auto reverbDamp = std::make_unique<AudioParameterFloat>(
@@ -344,7 +344,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::REVERB_DAMP_NAME,
 		NormalisableRange<float>(0.0f, 1.0f),
 		0.0f
-	);
+		);
 	params.push_back(std::move(reverbDamp));
 
 	auto reverbWidth = std::make_unique<AudioParameterFloat>(
@@ -352,7 +352,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::REVERB_WIDTH_NAME,
 		NormalisableRange<float>(0.0f, 1.0f),
 		0.0f
-	);
+		);
 	params.push_back(std::move(reverbWidth));
 
 	auto reverbMix = std::make_unique<AudioParameterFloat>(
@@ -360,7 +360,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::REVERB_MIX_NAME,
 		NormalisableRange<float>(0.0f, 1.0f),
 		0.0f
-	);
+		);
 	params.push_back(std::move(reverbMix));
 
 	//==============================================================================
@@ -377,7 +377,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 			Constants::HARSH
 		),
 		0
-	);
+		);
 	params.push_back(std::move(wsShape));
 
 	auto wsMix = std::make_unique<AudioParameterFloat>(
@@ -385,7 +385,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::WS_MIX_NAME,
 		NormalisableRange<float>(0.0f, 1.0f),
 		0.0f
-	);
+		);
 	params.push_back(std::move(wsMix));
 
 	//==============================================================================
@@ -394,16 +394,16 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 	auto unison = std::make_unique<AudioParameterInt>(
 		Constants::UNISON_ID,
 		Constants::UNISON_NAME,
-		1, 8, 1
-	);
+		1, 4, 1
+		);
 	params.push_back(std::move(unison));
 
 	auto detune = std::make_unique<AudioParameterFloat>(
 		Constants::DETUNE_ID,
 		Constants::DETUNE_NAME,
-		NormalisableRange<float>(0.0f, 1.0f),
+		NormalisableRange<float>(0.0f, 0.04166666666f),
 		0.0f
-	);
+		);
 	params.push_back(std::move(detune));
 
 	auto spread = std::make_unique<AudioParameterFloat>(
@@ -411,7 +411,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::SPREAD_NAME,
 		NormalisableRange<float>(0.0f, 1.0f),
 		0.0f
-	);
+		);
 	params.push_back(std::move(spread));
 
 	auto master = std::make_unique<AudioParameterFloat>(
@@ -419,7 +419,7 @@ AudioProcessorValueTreeState::ParameterLayout DragonWaveAudioProcessor::createPa
 		Constants::MASTER_NAME,
 		NormalisableRange<float>(0.0f, 2.0f, 0.001f, 0.5f),
 		1.0f
-	);
+		);
 	params.push_back(std::move(master));
 
 	return { params.begin(), params.end() };
@@ -548,6 +548,12 @@ void DragonWaveAudioProcessor::processBlock(AudioBuffer<float> & buffer, MidiBuf
 
 		if (voice != nullptr)
 		{
+			voice->setGlobalParams(
+				parameters.getRawParameterValue(Constants::UNISON_ID),
+				parameters.getRawParameterValue(Constants::DETUNE_ID),
+				parameters.getRawParameterValue(Constants::SPREAD_ID)
+			);
+
 			voice->setCarrierPitchShift(
 				parameters.getRawParameterValue(Constants::CARRIER_OSC_PITCH_ID)
 			);
@@ -664,7 +670,7 @@ AudioProcessorEditor* DragonWaveAudioProcessor::createEditor()
 }
 
 //==============================================================================
-void DragonWaveAudioProcessor::getStateInformation(MemoryBlock& destData)
+void DragonWaveAudioProcessor::getStateInformation(MemoryBlock & destData)
 {
 	// Copy state and convert to XML
 	auto state = parameters.copyState();
