@@ -74,6 +74,15 @@ void WavetableVoice::startNote(
 		fmDeltas[i] = (frequency + (frequency * detuneAmounts[i])) * wavetableSize / (float)getSampleRate();
 	}
 
+	if (currentUnison > 1)
+	{
+		auto phases = Util::linspace(0.0, 0.375, currentUnison);
+		for (int i = 0; i < currentUnison; i++)
+		{
+			carrierIndices[i] = phases[i] * (float)wavetableSize;
+		}
+	}
+
 	// Calculate carrier oscillator mixing proportions
 	if (carrierBFs.first != carrierBFs.second)
 		carrierWavetableMix = (frequency - carrierBFs.first) / (carrierBFs.second - carrierBFs.first);
@@ -221,8 +230,8 @@ void WavetableVoice::renderNextBlock(AudioSampleBuffer& outputBuffer, int startS
 					// Mix down and spread
 					//==============================================================================
 
-					float leftSample = currentCarrierSample + (gainFactor * spreadAmounts[i] * spread);
-					float rightSample = currentCarrierSample - (gainFactor * spreadAmounts[i] * spread);
+					float leftSample = (currentCarrierSample + (currentCarrierSample * spreadAmounts[i] * spread)) * gainFactor;
+					float rightSample = (currentCarrierSample - (currentCarrierSample * spreadAmounts[i] * spread)) * gainFactor;
 
 					currentBuffer.addSample(0, s, leftSample);
 					currentBuffer.addSample(1, s, rightSample);
