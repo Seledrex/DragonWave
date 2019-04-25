@@ -109,6 +109,8 @@ private:
 	ADSR carrierEnvelope;
 	ADSR carrierFilterEnvelope;
 
+	bool noteIsActive = false;
+
 	//==============================================================================
 	NormalisableRange<float> filterCutoffRange;
 	float filterCutoffLowerBound = 0.0f;

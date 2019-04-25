@@ -110,12 +110,13 @@ void WavetableVoice::startNote(
 	}
 
 	previousUnison = currentUnison;
+	noteIsActive = true;
 }
 
 void WavetableVoice::renderNextBlock(AudioSampleBuffer& outputBuffer, int startSample, int numSamples)
 {
 	// Make sure we have a note to play
-	if (carrierDeltas[0] != 0.0f)
+	if (noteIsActive)
 	{
 		if (carrier->getWaveformType() == Wavetable::Waveform::Noise)
 		{
@@ -263,8 +264,10 @@ void WavetableVoice::renderNextBlock(AudioSampleBuffer& outputBuffer, int startS
 				startSample++;
 			}
 
-			if (currentEnv < 0.001f)
+			if (currentEnv < 0.001f) {
 				clearCurrentNote();
+				noteIsActive = false;
+			}	
 		}
 	}
 }
@@ -285,8 +288,7 @@ void WavetableVoice::stopNote(float /*velocity*/, bool allowTailOff)
 	else
 	{
 		clearCurrentNote();
-		for (int i = 0; i < previousUnison; i++)
-			carrierDeltas[i] = 0.0f;
+		noteIsActive = false;
 	}
 }
 
