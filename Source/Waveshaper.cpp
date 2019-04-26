@@ -33,11 +33,11 @@ Waveshaper::Waveshaper() : currentTable(faintTable)
 	});
 }
 
-void Waveshaper::setParameters(TransferFunction f, float dry, float wet)
+void Waveshaper::setParameters(TransferFunction function, float dryAmount, float wetAmount)
 {
-	this->f = f;
-	this->dry = dry;
-	this->wet = wet;
+	f = function;
+	dry = dryAmount;
+	wet = wetAmount;
 
 	switch (this->f) {
 	case FAINT:
@@ -90,7 +90,7 @@ float Waveshaper::processSingleSample(float sample)
 	return currentSample * wet + sample * dry;
 }
 
-std::vector<float> Waveshaper::sampleTransferFunction(std::function<float(float)> f)
+std::vector<float> Waveshaper::sampleTransferFunction(std::function<float(float)> tf)
 {
 	float dx = 2.0f / size;
 	float x = -1.0f;
@@ -98,7 +98,7 @@ std::vector<float> Waveshaper::sampleTransferFunction(std::function<float(float)
 	std::vector<float> table(size, 0);
 	for (int i = 0; i < size; i++)
 	{
-		float sample = f(x);
+		float sample = tf(x);
 
 		if (sample < -1.0f)
 			sample = -1.0f;

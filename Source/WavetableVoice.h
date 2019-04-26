@@ -48,7 +48,7 @@ private:
 	int pitchShift = 0;
 
 	float carrierFilterCutoff = 0.0f;
-	float carrierFilterType = 0.0f;
+	int carrierFilterType = 0;
 	float carrierFilterQ = 0.0f;
 
 	float fmFrequency = 0.0f;

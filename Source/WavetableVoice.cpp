@@ -152,9 +152,6 @@ void WavetableVoice::renderNextBlock(AudioSampleBuffer& outputBuffer, int startS
 
 			for (int i = 0; i < previousUnison; i++)
 			{
-				int currentNumSamples = numSamples;
-				int currentStartSample = startSample;
-
 				for (int s = 0; s < numSamples; s++)
 				{
 					//==============================================================================
@@ -234,8 +231,6 @@ void WavetableVoice::renderNextBlock(AudioSampleBuffer& outputBuffer, int startS
 
 					currentBuffer.addSample(0, s, leftSample);
 					currentBuffer.addSample(1, s, rightSample);
-
-					currentStartSample++;
 				}
 			}
 
@@ -254,7 +249,7 @@ void WavetableVoice::renderNextBlock(AudioSampleBuffer& outputBuffer, int startS
 					filterCutoffUpperBound
 				);
 
-				setCarrierFilterParams(carrierFilterType, newCutoff, carrierFilterQ);
+				setCarrierFilterParams((float)carrierFilterType, newCutoff, carrierFilterQ);
 				float leftSample = carrierFilterL.processSingleSampleRaw(currentBuffer.getSample(0, s));
 				float rightSample = carrierFilterR.processSingleSampleRaw(currentBuffer.getSample(1, s));
 
@@ -316,7 +311,7 @@ void WavetableVoice::setCarrierPitchShift(float* shift)
 
 void WavetableVoice::setCarrierFilterParams(float newType, float newCutoff, float newQ)
 {
-	carrierFilterType = newType;
+	carrierFilterType = (int)newType;
 	carrierFilterCutoff = newCutoff;
 	carrierFilterQ = newQ;
 
@@ -370,8 +365,8 @@ void WavetableVoice::setFmOscParams(float* newFrequency, float* newDepth)
 void WavetableVoice::setFmFilterParams(float* newType, float* newCutoff, float* newQ)
 {
 	fmFilterType = (int)* newType;
-	fmFilterCutoff = (double)* newCutoff;
-	fmFilterQ = (double)* newQ;
+	fmFilterCutoff = *newCutoff;
+	fmFilterQ = *newQ;
 
 	for (int i = 0; i < previousUnison; i++)
 		setFilterParams(fmFilters.getUnchecked(i), fmFilterType, fmFilterCutoff, fmFilterQ);

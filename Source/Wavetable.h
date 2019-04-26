@@ -46,6 +46,8 @@ public:
 			return "Noise";
 		case Wavetable::Waveform::Arbitrary:
 			return "Arbitrary";
+		default:
+			return "Sine";
 		}
 	}
 

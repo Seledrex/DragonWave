@@ -30,7 +30,7 @@ public:
 	Waveshaper();
 
 	//==============================================================================
-	void setParameters(TransferFunction f, float dry, float wet);
+	void setParameters(TransferFunction function, float dryAmount, float wetAmount);
 	void processMono(float* buffer, int numSamples);
 	void processStereo(float* leftChannel, float* rightChannel, int numSamples);
 	float processSingleSample(float sample);
