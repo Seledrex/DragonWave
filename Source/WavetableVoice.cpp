@@ -224,7 +224,6 @@ void WavetableVoice::renderNextBlock(AudioSampleBuffer& outputBuffer, int startS
 
 					// Mix samples from both wavetables 
 					currentCarrierSample = currentSampleLo * (1.0f - carrierWavetableMix) + currentSampleHi * carrierWavetableMix;
-					currentCarrierSample *= gainFactor;
 
 					//==============================================================================
 					// Mix down and spread
